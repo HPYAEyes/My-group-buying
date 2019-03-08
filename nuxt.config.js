@@ -1,4 +1,5 @@
 const pkg = require('./package')
+const path = require('path')
 
 module.exports = {
   mode: 'universal',
@@ -61,7 +62,13 @@ module.exports = {
     ** You can extend webpack config here
     */
     extend(config, ctx) {
-      
+      // 添加 alias 配置
+      Object.assign(config.resolve.alias, {
+        'utils': path.resolve(__dirname, 'utils'),
+        'api': path.resolve(__dirname, 'api'),
+        'components': path.resolve(__dirname, 'components'),
+        'store': path.resolve(__dirname, 'store'),
+      })
     }
   }
 }
