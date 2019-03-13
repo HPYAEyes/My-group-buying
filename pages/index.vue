@@ -68,13 +68,7 @@
       </div>
       <dl class="card-footer">
         <dt>热门地区：</dt>
-        <dd>西湖区</dd>
-        <dd>上城区</dd>
-        <dd>下城区</dd>
-        <dd>拱墅区</dd>
-        <dd>江干区</dd>
-        <dd>萧山区</dd>
-        <dd>滨江区</dd>
+        <dd v-for="item in areaList" :key="item.adcode">{{ item.name }}</dd>
       </dl>
     </div>
     <div class="section-card">
@@ -154,6 +148,13 @@
   </div>
 </template>
 <script>
+import { createNamespacedHelpers  } from 'vuex';
+import {
+  getHotArea
+} from 'api/index';
+
+const { mapState, mapActions } = createNamespacedHelpers('geo');
+
 export default {
   name: 'index',
   data() {
@@ -251,6 +252,22 @@ export default {
         },
       ]
     };
+  },
+  async mounted() {
+    const { data: { data: { areaList } } } = await getHotArea(this.cityAdcode);
+    console.log(areaList)
+    this.setHotArea(areaList);
+  },
+  computed: {
+    ...mapState({
+      areaList: state => state.hotArea,
+      cityAdcode: state => state.position.adcode
+    })
+  },
+  methods: {
+    ...mapActions([
+      'setHotArea'
+    ])
   }
 }
 </script>

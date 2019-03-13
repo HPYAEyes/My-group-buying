@@ -38,8 +38,10 @@ export function logout() {
   return request.get('/users/signout');
 }
 
-export function test(_id) {
-  return request.post('/users/getId', {
-    _id
-  });
+export function getCity(adcode) {
+  return request.get(`/geo/getCityInfo?adcode=${adcode}`);
+}
+
+export function getHotArea(adcode) {
+  return request.get(`/geo/getArea?adcode=${adcode}`);
 }

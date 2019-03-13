@@ -4,7 +4,21 @@
       <i class="el-icon-menu"></i>
       <span>首页</span>
       <i class="el-icon-location"></i>
-      <span>杭州</span>
+      <el-popover
+        class="select-city"
+        placement="bottom"
+        width="350"
+        trigger="click">
+        <el-cascader
+          v-model="selectCity"
+          :options="geoOptions"
+          :props="geoProps"
+          :show-all-levels="false"
+          filterable>
+        </el-cascader>
+        <el-button type="primary" size="small" style="margin-left: 20px" @click="switchCity">切换城市</el-button>
+        <el-button type="text" slot="reference" style="color:#666">{{ currentCity }}</el-button>
+      </el-popover>
     </div>
     <div class="index-header-right">
       <template v-if="username === ''">
@@ -93,18 +107,50 @@
   </el-header>
 </template>
 <script>
+import { createNamespacedHelpers  } from 'vuex';
 import {
   getChkCode,
   register,
   login,
   getUser,
-  logout
+  logout,
+  getCity
 } from 'api/index';
+
+const { mapState, mapActions } = createNamespacedHelpers('geo');
 
 export default {
   name: 'headerbar',
   data() {
     return {
+      selectCity: [],
+      geoOptions: [
+        {
+          adcode: 'geo',
+          name: '省份',
+          districts: this.$store.state.geo.cityList
+        },
+        {
+          adcode: 'hot',
+          name: '热门城市',
+          districts: this.$store.state.geo.hotCity
+        }, 
+        {
+          adcode: 'position',
+          name: '定位城市',
+          districts: [
+            {
+              adcode: this.$store.state.geo.position.adcode,
+              name: this.$store.state.geo.position.city
+            }
+          ]
+        }
+      ],
+      geoProps: {
+        value: 'adcode',
+        label: 'name',
+        children: 'districts'
+      },
       registerDialog: false,
       registerForm: {
         username: '',
@@ -162,13 +208,42 @@ export default {
     const { data: { username } } = await getUser();
     this.username = username;
   },
+  computed: {
+    ...mapState({
+      position: state => state.position,
+      choosedCity: state => state.choosedCity
+    }),
+    currentCity() {
+      return this.choosedCity ? this.choosedCity.city : this.position.city;
+    },
+    selectCityCode() {
+      return this.selectCity[this.selectCity.length - 1];
+    }
+  },
   methods: {
+    ...mapActions([
+      'setChoosedCity'
+    ]),
+    /**
+     * @description 切换当前城市
+     */
+    switchCity() {
+      getCity(this.selectCityCode).then((res) => {
+        const { data: { districts } } = res.data;
+        this.setChoosedCity(districts[0]);
+        location.href = '/';
+      });
+    },
+    /**
+     * @description 重置表单
+     * @param {String} formName 注册弹窗表单对象
+     */
     clearFormData(formName) {
       this.$refs[formName].resetFields();
     },
     /**
      * @description 获取验证码
-     * @param params 注册弹窗表单对象
+     * @param {Object} params 注册弹窗表单对象
      */
     getCheckCode(params = this.registerForm) {
       let isNamePass, isEmailPass;
@@ -204,7 +279,7 @@ export default {
     },
     /**
      * @description 注册
-     * @param params 注册弹窗表单对象
+     * @param {Object} params 注册弹窗表单对象
      */
     handleRegister(params = this.registerForm) {
       this.$refs.registerForm.validate((valid) => {
@@ -230,7 +305,7 @@ export default {
     },
     /**
      * @description 登录
-     * @param params 登录弹窗表单对象
+     * @param {Object} params 登录弹窗表单对象
      */
     handleLogin(params = this.loginForm) {
       this.$refs.loginForm.validate((valid) => {
