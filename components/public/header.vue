@@ -17,7 +17,7 @@
           filterable>
         </el-cascader>
         <el-button type="primary" size="small" style="margin-left: 20px" @click="switchCity">切换城市</el-button>
-        <el-button type="text" slot="reference" style="color:#666">{{ currentCity }}</el-button>
+        <el-button type="text" slot="reference" style="color:#666">{{ choosedCity ? choosedCity.name : position.city }}</el-button>
       </el-popover>
     </div>
     <div class="index-header-right">
@@ -123,7 +123,8 @@ export default {
   name: 'headerbar',
   data() {
     return {
-      selectCity: [],
+      selectCity: [], // 切换城市选择框中选择的城市
+      choosedCity: '', // 默认选择的城市
       geoOptions: [
         {
           adcode: 'geo',
@@ -205,17 +206,15 @@ export default {
     };
   },
   async mounted() {
+    this.choosedCity = JSON.parse(window.localStorage.getItem('districts'));
+    this.setChoosedCity(this.choosedCity);
     const { data: { username } } = await getUser();
     this.username = username;
   },
   computed: {
     ...mapState({
       position: state => state.position,
-      choosedCity: state => state.choosedCity
     }),
-    currentCity() {
-      return this.choosedCity ? this.choosedCity.city : this.position.city;
-    },
     selectCityCode() {
       return this.selectCity[this.selectCity.length - 1];
     }
@@ -230,7 +229,8 @@ export default {
     switchCity() {
       getCity(this.selectCityCode).then((res) => {
         const { data: { districts } } = res.data;
-        this.setChoosedCity(districts[0]);
+        localStorage.setItem('districts', JSON.stringify(districts[0]));
+        // this.setChoosedCity(districts[0]);
         location.href = '/';
       });
     },
@@ -285,7 +285,7 @@ export default {
       this.$refs.registerForm.validate((valid) => {
         if (valid) {
           const query = {
-            username: window.encodeURIComponent(params.username),
+            username: params.username,
             email: params.email,
             password: params.password,
             code: params.checkcode

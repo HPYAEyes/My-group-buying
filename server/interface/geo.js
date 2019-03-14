@@ -74,7 +74,7 @@ router.get('/getHotCity', async (ctx) => {
   const districts = [
     {
       name: '北京市',
-      adcode: '110000'
+      adcode: '110100'
     },
     {
       name: '上海市',
@@ -90,7 +90,7 @@ router.get('/getHotCity', async (ctx) => {
     },
     {
       name: '天津市',
-      adcode: '120000'
+      adcode: '120100'
     },
     {
       name: '武汉市',
@@ -106,7 +106,7 @@ router.get('/getHotCity', async (ctx) => {
     },
     {
       name: '重庆市',
-      adcode: '500000'
+      adcode: '500100'
     },
     {
       name: '厦门市',
@@ -143,23 +143,24 @@ router.get('/getCityInfo', async (ctx) => {
   }
 });
 
-// 获取城市热门地区
+// 获取城市地区
 router.get('/getArea', async (ctx) => {
-  const { adcode } = ctx.request.query;
+  const { adcode, hot } = ctx.request.query;
   const { data: { status, districts }} = await axios.get(`${cityUrl}?key=${gdKey}&keywords=${adcode}&subdistrict=1`);
+  const areaList = districts[0].districts.sort((pre, next) => pre.adcode - next.adcode);
   if (status === '1') {
     ctx.body = {
       code: 'SUC',
       data: {
-        areaList: districts[0].districts.sort((pre, next) => pre.adcode - next.adcode)
+        areaList: hot ? areaList.slice(0, 8) : areaList
       },
-      msg: '获取热门地区成功'
+      msg: '获取地区成功'
     };
   } else {
     ctx.body = {
       code: 'SERR',
       data: null,
-      msg: '获取热门地区失败'
+      msg: '获取地区失败'
     };
   }
 });

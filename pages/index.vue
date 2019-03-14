@@ -69,6 +69,7 @@
       <dl class="card-footer">
         <dt>热门地区：</dt>
         <dd v-for="item in areaList" :key="item.adcode">{{ item.name }}</dd>
+        <a class="more-info" href="" style="margin: 0;position:absolute;right:36px;">更多</a>
       </dl>
     </div>
     <div class="section-card">
@@ -254,14 +255,13 @@ export default {
     };
   },
   async mounted() {
-    const { data: { data: { areaList } } } = await getHotArea(this.cityAdcode);
-    console.log(areaList)
+    const { data: { data: { areaList } } } = await getHotArea(this.cityAdcode, true);
     this.setHotArea(areaList);
   },
   computed: {
     ...mapState({
       areaList: state => state.hotArea,
-      cityAdcode: state => state.position.adcode
+      cityAdcode: state => state.choosedCity ? state.choosedCity.adcode : state.position.adcode
     })
   },
   methods: {
@@ -334,6 +334,7 @@ export default {
     }
 
     .card-footer {
+      position: relative;
       display: flex;
       align-items: center;
       margin: 0;

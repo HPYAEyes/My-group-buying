@@ -42,6 +42,6 @@ export function getCity(adcode) {
   return request.get(`/geo/getCityInfo?adcode=${adcode}`);
 }
 
-export function getHotArea(adcode) {
-  return request.get(`/geo/getArea?adcode=${adcode}`);
+export function getHotArea(adcode, hot) {
+  return request.get(`/geo/getArea?adcode=${adcode}&hot=${hot}`);
 }
