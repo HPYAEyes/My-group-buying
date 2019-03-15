@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 const TypeSchema = new Schema({
   name: {
     type: String,
-    require: true
+    required: true
   },
 })
 

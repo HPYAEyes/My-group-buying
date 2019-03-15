@@ -58,3 +58,9 @@ a {
   justify-content: center;
   align-items: center;
 }
+
+.text-overflow {
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}

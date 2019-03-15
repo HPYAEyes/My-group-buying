@@ -1,7 +1,7 @@
 <template>
   <el-header class="index-header" height="50px">
     <div class="index-header-left">
-      <i class="el-icon-menu"></i>
+      <i class="iconfont tg-home"></i>
       <span>首页</span>
       <i class="el-icon-location"></i>
       <el-popover
@@ -343,6 +343,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 14px;
   color: $greyFont;
 
   .index-header-left {

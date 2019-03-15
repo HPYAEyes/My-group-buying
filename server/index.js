@@ -7,6 +7,7 @@ import dbConfig from './dbs/configs';
 import passport from './interface/utils/passport';
 import users from './interface/users';
 import geo from './interface/geo';
+import product from './interface/product';
 
 const Koa = require('koa')
 const consola = require('consola')
@@ -52,6 +53,7 @@ async function start() {
   // 引入路由 在其它位置引入可能会产生意料外的错误
   app.use(users.routes()).use(users.allowedMethods())
   app.use(geo.routes()).use(geo.allowedMethods())
+  app.use(product.routes()).use(product.allowedMethods())
 
   app.use(ctx => {
     ctx.status = 200 // koa defaults to 404 when it sees that status is unset
