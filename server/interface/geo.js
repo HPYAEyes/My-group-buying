@@ -124,7 +124,7 @@ router.get('/getHotCity', async (ctx) => {
 
 // 获取指定城市信息
 router.get('/getCityInfo', async (ctx) => {
-  const { adcode } = ctx.request.query;
+  const { adcode } = ctx.query;
   const { data: { status, districts }} = await axios.get(`${cityUrl}?key=${gdKey}&keywords=${adcode}&subdistrict=0`);
   if (status === '1') {
     ctx.body = {
@@ -145,8 +145,14 @@ router.get('/getCityInfo', async (ctx) => {
 
 // 获取城市地区
 router.get('/getArea', async (ctx) => {
-  const { adcode, hot } = ctx.request.query;
-  const { data: { status, districts }} = await axios.get(`${cityUrl}?key=${gdKey}&keywords=${adcode}&subdistrict=1`);
+  const { adcode, hot, subdistrict } = ctx.query;
+  const { data: { status, districts }} = await axios.get(`${cityUrl}`, {
+    params: {
+      key: gdKey,
+      keywords: adcode,
+      subdistrict,
+    }
+  });
   const areaList = districts[0].districts.sort((pre, next) => pre.adcode - next.adcode);
   if (status === '1') {
     ctx.body = {

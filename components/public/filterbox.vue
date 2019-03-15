@@ -2,12 +2,12 @@
   <div class="filter-components">
     <span class="filter-item filter-all" :class="{ 'is-active': activeList[0] }" @click="handleClick(0, '全部')">全部</span>
     <ul class="filter-list">
-      <template v-for="(item, index) in typeList">
+      <template v-for="(item, index) in data">
         <li
           class="filter-item"
           :class="{ 'is-active': activeList[index + 1] }"
           :key="index"
-          @click="handleClick(index + 1, item)">{{ item }}</li>
+          @click="handleClick(index + 1, item)">{{ item[label] }}</li>
       </template>
     </ul>
   </div>
@@ -15,18 +15,17 @@
 <script>
 export default {
   name: 'filterbox',
-  props: ['data', 'default'],
+  props: ['data', 'default', 'label'],
   data() {
     return {
-      typeList: this.data,
       lastIndex: 0,
       activeList: ''
     };
   },
   mounted() {
-    this.lastIndex = this.typeList.findIndex((item) => item === this.default) === -1 ? 0 :this.typeList.findIndex((item) => item === this.default) ;
-    this.activeList = new Array(this.typeList.length + 1).fill(false);
-    this.activeList[this.lastIndex] = true;
+    this.lastIndex = this.data.findIndex((item) => item[this.label] === this.default) === -1 ? 0 : this.data.findIndex((item) => item[this.label] === this.default) + 1;
+    this.activeList = new Array(this.data.length + 1).fill(false);
+    this.$set(this.activeList, this.lastIndex, true);
   },
   methods: {
     handleClick(index, val) {
@@ -34,6 +33,7 @@ export default {
       this.$set(this.activeList, index, true);
       this.lastIndex = index;
       this.$emit('change', val);
+      this.$emit('update:default', val === '全部' ? '全部' : val[this.label]);
     }
   }
 }

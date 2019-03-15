@@ -9,14 +9,18 @@ const ProductSchema = new Schema({
     type: String,
     required: true
   },
-  place: {
-    type: String,
-    required: true
-  },  
   price: {
     type: Number,
     required: true
   },
+  place: {
+    type: String,
+    required: true
+  },  
+  address: {
+    type: String,
+    required: true
+  },  
   adcode: {
     type: String,
     required: true
@@ -54,6 +58,7 @@ const ProductSchema = new Schema({
   ],
   averRate: {
     type: Number,
+    default: 0,
     min: 0,
     max: 5,
     required: true
@@ -67,16 +72,6 @@ const ProductSchema = new Schema({
     maxlength: 100,
     required: true
   },
-  createTime: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-  updateTime: {
-    type: Date,
-    default: Date.now,
-    required: true
-  },
-})
+}, { timestamps: true })
 
 export default mongoose.model('Product', ProductSchema)

@@ -4,15 +4,27 @@
     <div class="filter">
       <div class="filter-box">
         <span class="filter-title">分类：</span>
-        <filterbox :data="filterType.typeList" :default="filterType.choosedType" @change="handleTypeChange"/>
+        <filterbox
+          :data="filterType.typeList"
+          :default.sync="filterType.choosedType"
+          :label="filterType.label"
+          @change="handleTypeChange"/>
       </div>
       <div class="filter-box">
         <span class="filter-title">地点：</span>
-        <filterbox :data="filterPlace.placeList" :default="filterPlace.choosedPlace" @change="handlePlaceChange"/>
+        <filterbox
+          :data="filterPlace.placeList"
+          :default.sync="filterPlace.choosedPlace"
+          :label="filterPlace.label"
+          @change="handlePlaceChange"/>
       </div>
-      <div class="filter-box">
+      <div class="filter-box" v-if="filterPlace.choosedPlace !== '全部'">
         <span class="filter-title">街道：</span>
-        <filterbox :data="filterStreet.streetList" :default="filterStreet.choosedStreet" @change="handleStreetChange"/>
+        <filterbox
+          :data="filterStreet.streetList"
+          :default.sync="filterStreet.choosedStreet"
+          :label="filterStreet.label"
+          @change="handleStreetChange"/>
       </div>
     </div>
     <!-- filter end -->
@@ -63,7 +75,8 @@
 import Filterbox from '@/components/public/filterbox.vue';
 import { createNamespacedHelpers  } from 'vuex';
 import {
-  queryTypeList
+  queryTypeList,
+  queryPlaceList
 } from 'api/productList';
 
 const { mapState, mapActions } = createNamespacedHelpers('product');
@@ -72,17 +85,15 @@ export default {
   name: 'productList',
   data() {
     return {
-      filterType: {
-        choosedType: '全部',
-        typeList: ['按摩/足疗', '桌游', 'KTV', '网吧', '茶馆', '运动健身'],
-      },
       filterPlace: {
         choosedPlace: '全部',
-        placeList: ['西湖区', '拱墅区', '上城区', '下城区', '江干区']
+        placeList: [],
+        label: 'name',
       },
       filterStreet: {
         choosedStreet: '全部',
-        streetList: ['灵隐街道', '文新街道', '三墩镇', '西湖街道']
+        streetList: [],
+        label: 'name',
       },
       rate: 4.5
     };
@@ -90,12 +101,20 @@ export default {
   components: {
     Filterbox
   },
-  async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
+  async asyncData({ store }) {
     const { data: { data: typeList } } = await queryTypeList();
-    console.log(store);
+    return {
+      filterType: {
+        choosedType: '私人影院',
+        typeList,
+        label: 'name',
+      },
+    }
   },
-  mounted() {
-
+  async mounted() {
+    const { data: { data: { areaList: placeList } } } = await queryPlaceList(this.$store.state.geo.choosedCity.adcode);
+    this.filterPlace.placeList = placeList;
+    console.log(placeList);
   },
   methods: {
     handleTypeChange(val) {
@@ -103,6 +122,7 @@ export default {
     },
     handlePlaceChange(val) {
       console.log(val);
+      this.filterStreet.streetList = val === '全部' ? [] : val.districts;
     },
     handleStreetChange(val) {
       console.log(val);
