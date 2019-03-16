@@ -76,10 +76,23 @@
         </li>
       </ul>
     </div>
+    <div class="product-amap">
+      <no-ssr>
+        <el-amap
+          ref="amap"
+          vid="myamap"
+          :center="gdMap.center"
+          :zoom="gdMap.zoom"
+          :map-manager="gdMap.amapManager"
+          :events="gdMap.events">
+        </el-amap>
+      </no-ssr>
+    </div>
   </div>
 </template>
 <script>
 import Filterbox from '@/components/public/filterbox.vue';
+import { AMapManager } from 'vue-amap';
 import { createNamespacedHelpers  } from 'vuex';
 import {
   queryTypeList,
@@ -93,6 +106,15 @@ export default {
   name: 'productList',
   data() {
     return {
+      gdMap: {
+        zoom: 11,
+        center: ['121.59996', '31.197646'],
+        amapManager: AMapManager,
+      },
+      marker: {
+        position: ['121.59996', '31.197646'],
+        template: '<span>1</span>'
+      },
       filterPlace: {
         choosedPlace: '全部',
         placeList: [],
@@ -133,6 +155,23 @@ export default {
     this.filterPlace.placeList = placeList;
     console.log(placeList);
     this.getProductList();
+    const self = this;
+    this.gdMap.events = {
+      init(map) {
+        AMapUI.loadUI(['overlay/SimpleMarker'], (SimpleMarker) =>{
+          console.log(self);
+          const marker = new SimpleMarker({
+            iconStyle: 'red-1',
+            iconTheme: 'numv2',
+            map: map,
+            position: map.getCenter()
+          });
+          marker.on('click', () => {
+            console.log(map.getCenter());
+          }, self);
+        });
+      }
+    }
   },
   methods: {
     /**
@@ -162,6 +201,9 @@ export default {
     handleTypeChange(val) {
       console.log(val);
     },
+    /**
+     * @description 选择的地点改变时的处理
+     */
     handlePlaceChange(val) {
       console.log(val);
       this.filterStreet.choosedStreet = '全部';
@@ -181,12 +223,15 @@ export default {
   width: 1200px;
   min-height: 100vh;
   margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
 
   .filter {
     width: 100%;
     margin-top: 30px;
     margin-bottom: 16px;
     padding: 16px;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     border: 1px solid $border;
@@ -211,7 +256,7 @@ export default {
   }
 
   .product {
-    width: 80%;
+    width: 75%;
     margin-right: 16px;
     margin-bottom: 16px;
     padding: 0 20px;
@@ -306,6 +351,13 @@ export default {
         }
       }
     }
+  }
+
+  .product-amap {
+    flex-grow: 1;
+    height: 250px;
+    border: 1px solid $border;
+    border-radius: 4px;
   }
 }
 </style>

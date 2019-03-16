@@ -30,7 +30,8 @@
     "nodemailer": "^5.1.1",
     "nuxt": "^2.0.0",
     "passport-local": "^1.0.0",
-    "sass-loader": "^7.1.0"
+    "sass-loader": "^7.1.0",
+    "vue-amap": "^0.5.8"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
