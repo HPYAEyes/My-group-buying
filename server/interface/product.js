@@ -37,6 +37,9 @@ router.post('/addProduct', async (ctx) => {
     place,
     address,
     adcode,
+    cityCode,
+    city,
+    area,
     imgUrl,
     description
   } = ctx.request.body;
@@ -47,6 +50,9 @@ router.post('/addProduct', async (ctx) => {
     place,
     address,
     adcode,
+    cityCode,
+    city,
+    area,
     imgUrl,
     description
   });
@@ -65,6 +71,49 @@ router.post('/addProduct', async (ctx) => {
   }
 });
 
-// 
+// 获取团购信息列表
+router.get('/getProductList', async (ctx) => {
+  const { pageSize, pageNum, cityCode, adcode, type, street, sort } = ctx.query;
+  if (!pageSize || !pageNum || !cityCode || !sort) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const filterBy = [ // sort: 0为创建时间降序，1为价格降序，2为价格升序，3为人气降序
+    { createAt: 'desc'},
+    { price: 'desc'},
+    { price: 'asc'},
+    { averRate: 'desc'},
+  ]
+  const params = { cityCode };
+  if (adcode) {
+    params.adcode = adcode;
+  }
+  if (street) {
+    params.street = street;
+  }
+  if (type) {
+    params.type = type;
+  }
+  const productList = await Product.find(params).skip((pageNum - 1) * pageSize).limit(Number(pageSize)).sort(filterBy[sort]).exec();
+  const totalRecords = await Product.countDocuments(params);
+  if (productList && totalRecords !== undefined) {
+    ctx.body = {
+      code: 'SUC',
+      data: {
+        productList,
+        totalRecords
+      },
+      msg: '获取团购信息列表成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      msg: '获取团购信息列表失败'
+    };
+  }
+});
 
 export default router;

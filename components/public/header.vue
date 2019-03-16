@@ -231,7 +231,7 @@ export default {
         const { data: { districts } } = res.data;
         localStorage.setItem('districts', JSON.stringify(districts[0]));
         // this.setChoosedCity(districts[0]);
-        location.href = '/';
+        location.reload();
       });
     },
     /**
@@ -294,7 +294,7 @@ export default {
             this.$message.success(res.data.msg);
             this.registerDialog = false;
             setTimeout(() => {
-              location.href = '/';
+              location.reload();
             }, 2000);
           });
         } else {
@@ -314,7 +314,7 @@ export default {
             this.$message.success(res.data.msg);
             this.loginDialog = false;
             setTimeout(() => {
-              location.href = '/';
+              location.reload();
             }, 2000);
           });
         }
@@ -327,7 +327,7 @@ export default {
       logout().then((res) => {
         this.$message.success(res.data.msg);
         setTimeout(() => {
-          location.href = '/';
+          location.reload();
         }, 2000);
       });
     }

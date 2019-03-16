@@ -1,6 +1,6 @@
 const pkg = require('./package')
 const path = require('path')
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
+const webpack = require('webpack')
 
 module.exports = {
   mode: 'universal',
@@ -70,7 +70,7 @@ module.exports = {
         'components': path.resolve(__dirname, 'components'),
         'store': path.resolve(__dirname, 'store'),
       })
-      config.plugins.push(new MomentLocalesPlugin());
+      config.plugins.push(new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/));
     }
   }
 }

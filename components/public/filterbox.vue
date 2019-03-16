@@ -15,7 +15,7 @@
 <script>
 export default {
   name: 'filterbox',
-  props: ['data', 'default', 'label'],
+  props: ['data', 'default', 'label', 'value'],
   data() {
     return {
       lastIndex: 0,
@@ -23,7 +23,7 @@ export default {
     };
   },
   mounted() {
-    this.lastIndex = this.data.findIndex((item) => item[this.label] === this.default) === -1 ? 0 : this.data.findIndex((item) => item[this.label] === this.default) + 1;
+    this.lastIndex = this.data.findIndex((item) => item[this.value] === this.default) === -1 ? 0 : this.data.findIndex((item) => item[this.value] === this.default) + 1;
     this.activeList = new Array(this.data.length + 1).fill(false);
     this.$set(this.activeList, this.lastIndex, true);
   },
@@ -33,7 +33,7 @@ export default {
       this.$set(this.activeList, index, true);
       this.lastIndex = index;
       this.$emit('change', val);
-      this.$emit('update:default', val === '全部' ? '全部' : val[this.label]);
+      this.$emit('update:default', val === '全部' ? '全部' : val[this.value]);
     }
   }
 }

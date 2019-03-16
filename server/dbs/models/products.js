@@ -25,6 +25,18 @@ const ProductSchema = new Schema({
     type: String,
     required: true
   },
+  cityCode: {
+    type: String,
+    required: true
+  },
+  city: {
+    type: String,
+    required: true
+  },
+  area: {
+    type: String,
+    required: true
+  },
   comments: [
     {
       userId: {

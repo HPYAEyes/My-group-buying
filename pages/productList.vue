@@ -8,6 +8,7 @@
           :data="filterType.typeList"
           :default.sync="filterType.choosedType"
           :label="filterType.label"
+          :value="filterType.value"
           @change="handleTypeChange"/>
       </div>
       <div class="filter-box">
@@ -16,6 +17,7 @@
           :data="filterPlace.placeList"
           :default.sync="filterPlace.choosedPlace"
           :label="filterPlace.label"
+          :value="filterPlace.value"
           @change="handlePlaceChange"/>
       </div>
       <div class="filter-box" v-if="filterPlace.choosedPlace !== '全部'">
@@ -24,6 +26,8 @@
           :data="filterStreet.streetList"
           :default.sync="filterStreet.choosedStreet"
           :label="filterStreet.label"
+          :value="filterStreet.value"
+          :key="filterStreet.choosedStreet"
           @change="handleStreetChange"/>
       </div>
     </div>
@@ -36,33 +40,36 @@
         <span class="product-sort">评价最高</span>
       </div>
       <ul class="product-list">
-        <li class="product-item">
-          <a href="#"><img class="item-img" src="../assets/img/img1.jpg" alt=""></a>
+        <li
+          class="product-item"
+          v-for="item in productList"
+          :key="item._id">
+          <a href="#"><img class="item-img" :src="item.imgUrl" :alt="item.name"></a>
           <div class="item-content">
-            <a class="item-header" href="#">嫌疑人X实景搜证推理侦探社(杭大店)</a>
+            <a class="item-header" href="#">{{ item.name }}</a>
             <div class="item-comment">
               <el-rate
-                v-model="rate"
+                v-model="item.averRate"
                 text-color="#ff9900"
                 disabled
                 allow-half
                 show-score></el-rate>
-              <span style="color:#409eff">1956人评论</span>
+              <span style="color:#409eff">{{ item.comments.length }}人评论</span>
             </div>
             <div class="item-place">
-              <span>密室</span>
+              <span>{{ item.type }}</span>
               <span style="color: #ccc">|</span>
-              <span>湖墅南路</span>
-              <span>草坝巷密渡桥路15世纪大厦19D</span>
+              <span>{{ item.place }}</span>
+              <span>{{ item.address }}</span>
             </div>
-            <div class="item-price">人均￥138</div>
+            <div class="item-price">人均￥{{ item.price }}</div>
             <div class="item-ticket">
               <i class="iconfont tg-tuan main-color"></i>
               <el-tooltip 
                 effect="dark"
-                content="149元/券，兴家旺足+轻食套餐，299元/券，3D影院·砭石养生套餐，199元/券，3D影院·养肝足疗套餐，289元/券 149元/券，兴家旺足+轻食套餐，299元/券，3D影院·砭石养生套餐，199元/券，3D影院·养肝足疗套餐，289元/券 149元/券，兴家旺足+轻食套餐，299元/券，3D影院·砭石养生套餐，199元/券，3D影院·养肝足疗套餐，289元/券"
+                :content="item.description"
                 placement="top">
-                <p class="text-overflow">149元/券，兴家旺足+轻食套餐，299元/券，3D影院·砭石养生套餐，199元/券，3D影院·养肝足疗套餐，289元/券,149元/券，兴家旺足+轻食套餐，299元/券，3D影院·砭石养生套餐，199元/券，3D影院·养肝足疗套餐，289元/券,149元/券，兴家旺足+轻食套餐，299元/券，3D影院·砭石养生套餐，199元/券，3D影院·养肝足疗套餐，289元/券,149元/券，兴家旺足+轻食套餐，299元/券，3D影院·砭石养生套餐，199元/券，3D影院·养肝足疗套餐，289元/券</p>
+                <p class="text-overflow">{{ item.description }}</p>
               </el-tooltip>
             </div>
           </div>
@@ -76,7 +83,8 @@ import Filterbox from '@/components/public/filterbox.vue';
 import { createNamespacedHelpers  } from 'vuex';
 import {
   queryTypeList,
-  queryPlaceList
+  queryPlaceList,
+  queryProductList
 } from 'api/productList';
 
 const { mapState, mapActions } = createNamespacedHelpers('product');
@@ -89,11 +97,19 @@ export default {
         choosedPlace: '全部',
         placeList: [],
         label: 'name',
+        value: 'adcode'
       },
       filterStreet: {
         choosedStreet: '全部',
         streetList: [],
         label: 'name',
+        value: 'name'
+      },
+      productList: [],
+      pageInfo: {
+        pageSize: 12,
+        pageNum: 1,
+        totalRecords: 0
       },
       rate: 4.5
     };
@@ -105,9 +121,10 @@ export default {
     const { data: { data: typeList } } = await queryTypeList();
     return {
       filterType: {
-        choosedType: '私人影院',
+        choosedType: '全部',
         typeList,
         label: 'name',
+        value: 'name'
       },
     }
   },
@@ -115,13 +132,39 @@ export default {
     const { data: { data: { areaList: placeList } } } = await queryPlaceList(this.$store.state.geo.choosedCity.adcode);
     this.filterPlace.placeList = placeList;
     console.log(placeList);
+    this.getProductList();
   },
   methods: {
+    /**
+     * @description 获取团购信息列表
+     */
+    getProductList() {
+      const type = this.filterType.choosedType === '全部' ? undefined : this.filterType.choosedType;
+      const street = this.filterStreet.choosedStreet === '全部' ? undefined : this.filterStreet.choosedStreet;
+      const adcode = this.filterPlace.choosedPlace === '全部' ? undefined : this.filterPlace.choosedPlace;
+      // TODO sort
+      const sort = 0;
+      const params = {
+        pageNum: this.pageInfo.pageNum,
+        pageSize: this.pageInfo.pageSize,
+        cityCode: this.$store.state.geo.choosedCity.adcode,
+        adcode,
+        sort,
+        type,
+        street
+      };
+      queryProductList(params).then((resp) => {
+        const { data } = resp.data;
+        this.productList = data.productList;
+        this.pageInfo.totalRecords = data.totalRecords;
+      });
+    },
     handleTypeChange(val) {
       console.log(val);
     },
     handlePlaceChange(val) {
       console.log(val);
+      this.filterStreet.choosedStreet = '全部';
       this.filterStreet.streetList = val === '全部' ? [] : val.districts;
     },
     handleStreetChange(val) {
@@ -170,7 +213,8 @@ export default {
   .product {
     width: 80%;
     margin-right: 16px;
-    padding: 0 20px 16px;
+    margin-bottom: 16px;
+    padding: 0 20px;
     border: 1px solid $border;
     border-radius: 4px;
     background-color: #fff;
@@ -193,10 +237,15 @@ export default {
     }
 
     .product-list {
-      padding: 20px 0;
 
       .product-item {
         display: flex;
+        padding: 20px 0;
+        border-bottom: 1px solid $border;
+
+        &:last-child {
+          border-bottom: 0;
+        }
 
         .item-img {
           width: 220px;
