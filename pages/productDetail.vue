@@ -243,7 +243,7 @@ export default {
   margin: 0 auto;
 
   .product-recommand {
-    width: calc(25% - 105px);
+    width: calc(25% - 116px);
     position: absolute;
     top: 400px;
     right: 0;

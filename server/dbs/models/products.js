@@ -84,6 +84,34 @@ const ProductSchema = new Schema({
     maxlength: 100,
     required: true
   },
+  tel: {
+    type: String,
+    maxlength: 13,
+    required: true
+  },
+  officeHours: {
+    type: String,
+    required: true
+  },
+  saleList: [
+    {
+      name: {
+        type: String,
+        required: true
+      },
+      salePrice: {
+        type: Number,
+        required: true
+      },
+      offPrice: {
+        type: Number,
+        required: true
+      },
+      imgUrl: {
+        type: String
+      }
+    }
+  ]
 }, { timestamps: true })
 
 export default mongoose.model('Product', ProductSchema)
