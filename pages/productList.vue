@@ -34,10 +34,12 @@
     <!-- filter end -->
     <div class="product">
       <div class="product-header">
-        <span class="is-select product-sort">默认</span>
-        <span class="product-sort">价格排序</span>
-        <span class="product-sort">人气最高</span>
-        <span class="product-sort">评价最高</span>
+        <el-radio-group v-model="listSort" size="small">
+          <el-radio-button label="默认"></el-radio-button>
+          <el-radio-button label="价格排序"></el-radio-button>
+          <el-radio-button label="人气最高"></el-radio-button>
+          <el-radio-button label="评价最高"></el-radio-button>
+        </el-radio-group>
       </div>
       <ul class="product-list">
         <li
@@ -75,6 +77,56 @@
           </div>
         </li>
       </ul>
+      <div class="product-recommand hot-recommand">
+        <p>近期热门推荐</p>
+        <ul>
+          <li>
+            <a href="#">
+              <img src="../assets/img/img1.jpg" alt="">
+              <p>悦壹生视力矫正中心</p>
+              <div class="comment">
+                <el-rate
+                  v-model="rate"
+                  disabled
+                  allow-half></el-rate>
+                <span class="count">22个评价</span>
+              </div>
+              <p class="address">北景园</p>
+              <p class="price">人均￥<span>92</span></p>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <img src="../assets/img/img1.jpg" alt="">
+              <p>悦壹生视力矫正中心</p>
+              <div class="comment">
+                <el-rate
+                  v-model="rate"
+                  disabled
+                  allow-half></el-rate>
+                <span class="count">22个评价</span>
+              </div>
+              <p class="address">北景园</p>
+              <p class="price">人均￥<span>92</span></p>
+            </a>
+          </li>
+          <li>
+            <a href="#">
+              <img src="../assets/img/img1.jpg" alt="">
+              <p>悦壹生视力矫正中心</p>
+              <div class="comment">
+                <el-rate
+                  v-model="rate"
+                  disabled
+                  allow-half></el-rate>
+                <span class="count">22个评价</span>
+              </div>
+              <p class="address">北景园</p>
+              <p class="price">人均￥<span>92</span></p>
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
     <div class="product-amap">
       <no-ssr>
@@ -88,6 +140,7 @@
         </el-amap>
       </no-ssr>
     </div>
+
   </div>
 </template>
 <script>
@@ -133,7 +186,8 @@ export default {
         pageNum: 1,
         totalRecords: 0
       },
-      rate: 4.5
+      rate: 4.5,
+      listSort: '默认'
     };
   },
   components: {
@@ -256,6 +310,7 @@ export default {
   }
 
   .product {
+    position: relative;
     width: 75%;
     margin-right: 16px;
     margin-bottom: 16px;
@@ -271,14 +326,27 @@ export default {
       border-bottom: 1px solid $border;
       font-size: 12px;
 
-      .product-sort {
-        margin-right: 30px;
-        cursor: pointer;
+      .el-radio-button__orig-radio:checked+.el-radio-button__inner {
+        color: $mainColor;
+        background-color: #fff;
+        box-shadow: none;
       }
 
-      .is-select {
-        color: $mainColor;
+      .el-radio-button--small {
+        &:first-child {
+          .el-radio-button__inner {
+            padding: 9px 14px 9px 0;
+          }
+        }
       }
+
+      .el-radio-button {
+        .el-radio-button__inner {
+          border: 0;
+          border-radius: 0;
+        }
+      }
+
     }
 
     .product-list {
@@ -356,6 +424,15 @@ export default {
   .product-amap {
     flex-grow: 1;
     height: 250px;
+    border: 1px solid $border;
+    border-radius: 4px;
+  }
+
+  .product-recommand {
+    position: absolute;
+    top: 270px;
+    right: -256px;
+    width: calc(25% - 50px);
     border: 1px solid $border;
     border-radius: 4px;
   }

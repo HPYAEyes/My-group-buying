@@ -2,8 +2,8 @@
   <el-header class="index-header" height="50px">
     <div class="index-header-left">
       <i class="iconfont tg-home"></i>
-      <span>首页</span>
-      <i class="el-icon-location"></i>
+      <nuxt-link to="/">首页</nuxt-link>
+      <i class="el-icon-location" style="margin-left: 10px"></i>
       <el-popover
         class="select-city"
         placement="bottom"

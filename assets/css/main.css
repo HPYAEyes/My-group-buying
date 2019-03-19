@@ -3,18 +3,17 @@ body {
   color: #333;
 }
 
-ul {
+h1, h2, h3, h4, h5, h6, p, ul, li {
   margin: 0;
   padding: 0;
+}
+
+ul, li{
   list-style-type: none;
 }
 
-p {
-  margin: 0;
-  padding: 0;
-}
-
 a {
+  color: #666;
   text-decoration: none;
 }
 
@@ -63,4 +62,45 @@ a {
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
+}
+
+.hot-recommand {
+  padding: 12px 26px;
+  background-color: #fff;
+}
+
+.hot-recommand li{
+  margin-top: 12px;
+}
+
+.hot-recommand a {
+  font-size: 12px;
+}
+
+.hot-recommand img {
+  width: 185px;
+  height: 100px;
+  border-radius: 4px;
+}
+
+.hot-recommand .comment {
+  display: flex;
+}
+
+.hot-recommand p,
+.hot-recommand .comment {
+  margin: 4px 0;
+}
+
+.hot-recommand .count,
+.hot-recommand .address{
+  color: #999;
+}
+
+.hot-recommand .price {
+  color: #f60;
+}
+
+.hot-recommand .price span {
+  font-size: 18px;
 }
