@@ -93,6 +93,11 @@ const ProductSchema = new Schema({
     type: String,
     required: true
   },
+  hot: {
+    type: Boolean,
+    default: false,
+    required: true
+  },
   saleList: [
     {
       name: {

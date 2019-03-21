@@ -4,25 +4,25 @@
     <div class="detail-header">
       <div class="header-description">
         <div class="header-row">
-          <h1>悦壹生视力矫正中心</h1>
+          <h1>{{ productInfo.name }}</h1>
           <div style="display: flex;margin: 8px 0;">
             <el-rate
-              v-model="averRate"
+              v-model="productInfo.averRate"
               text-color="#ff9900"
               disabled
               allow-half
               show-score></el-rate>
-            <span style="margin-left: 8px">人均￥99</span>
+            <span style="margin-left: 8px">人均￥{{ productInfo.price }}</span>
           </div>
         </div>
         <div class="header-info">
-          <p>地址：萧山区西河路94号三江购物旁3楼</p>
-          <p>电话：0571-82715431</p>
-          <p>营业时间： 周一至周日 10:00-18:00</p>
+          <p>地址：{{ productInfo.address }}</p>
+          <p>电话：{{ productInfo.tel}}</p>
+          <p>营业时间： {{ productInfo.officeHours}}</p>
         </div>
       </div>
       <div class="header-image">
-        <img src="../assets/img/img1.jpg" alt="">
+        <img :src="productInfo.imgUrl" :alt="productInfo.name">
       </div>
     </div>
     <!-- header -->
@@ -213,6 +213,10 @@
   </div>
 </template>
 <script>
+import {
+  queryProduct
+} from 'api/product';
+
 export default {
   name: 'productDetail',
   data() {
@@ -222,6 +226,12 @@ export default {
       userRate: 0,
       userComment: '',
     };
+  },
+  async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
+    const { data: { data: productInfo } } = await queryProduct(route.query.id);
+    return {
+      productInfo
+    }
   },
   computed: {
     needWords() {

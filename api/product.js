@@ -17,7 +17,7 @@ export function queryProductList({
   type,
   street
 }) {
-  const query = `pageSize=${pageSize}&pageNum=${pageNum}&cityCode=${cityCode}&sort=${sort}`;
+  let query = `pageSize=${pageSize}&pageNum=${pageNum}&cityCode=${cityCode}&sort=${sort}`;
   if (adcode) {
     query += `&adcode=${adcode}`;
   }
@@ -28,4 +28,8 @@ export function queryProductList({
     query += `&street=${street}`;
   }
   return request.get(`/product/getProductList?${query}`);
+}
+
+export function queryProduct(id) {
+  return request.get(`/product/getProduct?id=${id}`);
 }

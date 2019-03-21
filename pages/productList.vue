@@ -46,9 +46,9 @@
           class="product-item"
           v-for="item in productList"
           :key="item._id">
-          <a href="#"><img class="item-img" :src="item.imgUrl" :alt="item.name"></a>
+          <nuxt-link :to="'/productDetail?id=' + item._id"><img class="item-img" :src="item.imgUrl" :alt="item.name"></nuxt-link>
           <div class="item-content">
-            <a class="item-header" href="#">{{ item.name }}</a>
+            <nuxt-link class="item-header" :to="'/productDetail?id=' + item._id">{{ item.name }}</nuxt-link>
             <div class="item-comment">
               <el-rate
                 v-model="item.averRate"
@@ -75,6 +75,15 @@
               </el-tooltip>
             </div>
           </div>
+        </li>
+        <li class="product-pagination">
+          <el-pagination
+            layout="prev, pager, next"
+            :page-size="pageInfo.pageSize"
+            :current-page.sync="pageInfo.pageNum"
+            :total="pageInfo.totalRecords"
+            @current-change="handlePageChange">
+          </el-pagination>
         </li>
       </ul>
       <div class="product-recommand hot-recommand">
@@ -151,7 +160,7 @@ import {
   queryTypeList,
   queryPlaceList,
   queryProductList
-} from 'api/productList';
+} from 'api/product';
 
 const { mapState, mapActions } = createNamespacedHelpers('product');
 
@@ -251,6 +260,12 @@ export default {
         this.productList = data.productList;
         this.pageInfo.totalRecords = data.totalRecords;
       });
+    },
+    /**
+     * @description 处理分页
+     */
+    handlePageChange() {
+      this.getProductList();
     },
     handleTypeChange(val) {
       console.log(val);
@@ -417,6 +432,12 @@ export default {
             }
           }
         }
+      }
+      
+      .product-pagination {
+        display: flex;
+        justify-content: center;
+        margin: 16px 0;
       }
     }
   }

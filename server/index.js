@@ -8,8 +8,10 @@ import passport from './interface/utils/passport';
 import users from './interface/users';
 import geo from './interface/geo';
 import product from './interface/product';
+import admin from './interface/adminusers';
 
 const Koa = require('koa')
+const cors = require('koa2-cors')
 const consola = require('consola')
 const { Nuxt, Builder } = require('nuxt')
 
@@ -28,6 +30,7 @@ app.use(bodyParser({
   extendTypes: ['json', 'form', 'text']
 }))
 app.use(json())
+app.use(cors())
 
 // 连接mongodb数据库
 mongoose.connect(dbConfig.dbs, {
@@ -54,6 +57,7 @@ async function start() {
   app.use(users.routes()).use(users.allowedMethods())
   app.use(geo.routes()).use(geo.allowedMethods())
   app.use(product.routes()).use(product.allowedMethods())
+  app.use(admin.routes()).use(admin.allowedMethods())
 
   app.use(ctx => {
     ctx.status = 200 // koa defaults to 404 when it sees that status is unset

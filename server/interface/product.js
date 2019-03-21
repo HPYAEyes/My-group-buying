@@ -41,7 +41,10 @@ router.post('/addProduct', async (ctx) => {
     city,
     area,
     imgUrl,
-    description
+    description,
+    tel,
+    officeHours,
+    hot
   } = ctx.request.body;
   const newProduct = await Product.create({
     name,
@@ -54,7 +57,10 @@ router.post('/addProduct', async (ctx) => {
     city,
     area,
     imgUrl,
-    description
+    description,
+    tel,
+    officeHours,
+    hot
   });
   const createTime = moment(newProduct.createAt).format('YYYY-MM-DD HH:mm:ss');
   console.log(createTime);
@@ -112,6 +118,34 @@ router.get('/getProductList', async (ctx) => {
     ctx.body = {
       code: 'DERR',
       msg: '获取团购信息列表失败'
+    };
+  }
+});
+
+// 获取团购信息详情
+router.get('/getProduct', async (ctx)=> {
+  const { id } = ctx.query;
+  if (!id) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const product = await Product.findOne({
+    _id: id
+  });
+  if (product) {
+    ctx.body = {
+      code: 'SUC',
+      data: product,
+      msg: '获取团购信息详情成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      data: product,
+      msg: '获取团购信息详情失败'
     };
   }
 });
