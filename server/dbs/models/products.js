@@ -29,12 +29,38 @@ const ProductSchema = new Schema({
     type: String,
     required: true
   },
-  city: {
+  area: {
     type: String,
     required: true
   },
-  area: {
+  averRate: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+    required: true
+  },
+  imgUrl: {
+    type: Array,
+    required: true
+  },
+  description: {
     type: String,
+    maxlength: 100,
+    required: true
+  },
+  tel: {
+    type: String,
+    maxlength: 13,
+    required: true
+  },
+  officeHours: {
+    type: String,
+    required: true
+  },
+  hot: {
+    type: Boolean,
+    default: false,
     required: true
   },
   comments: [
@@ -68,36 +94,6 @@ const ProductSchema = new Schema({
       },
     }
   ],
-  averRate: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 5,
-    required: true
-  },
-  imgUrl: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String,
-    maxlength: 100,
-    required: true
-  },
-  tel: {
-    type: String,
-    maxlength: 13,
-    required: true
-  },
-  officeHours: {
-    type: String,
-    required: true
-  },
-  hot: {
-    type: Boolean,
-    default: false,
-    required: true
-  },
   saleList: [
     {
       name: {
@@ -112,9 +108,6 @@ const ProductSchema = new Schema({
         type: Number,
         required: true
       },
-      imgUrl: {
-        type: String
-      }
     }
   ]
 }, { timestamps: true })

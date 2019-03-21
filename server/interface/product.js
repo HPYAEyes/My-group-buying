@@ -38,14 +38,33 @@ router.post('/addProduct', async (ctx) => {
     address,
     adcode,
     cityCode,
-    city,
     area,
     imgUrl,
     description,
     tel,
     officeHours,
-    hot
+    hot,
+    saleList
   } = ctx.request.body;
+  if (
+    !name ||
+    !type ||
+    !price ||
+    !address ||
+    !adcode ||
+    !cityCode ||
+    !description ||
+    !tel ||
+    !officeHours ||
+    imgUrl.length === 0 ||
+    saleList.length === 0
+  ) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
   const newProduct = await Product.create({
     name,
     type,
@@ -54,16 +73,14 @@ router.post('/addProduct', async (ctx) => {
     address,
     adcode,
     cityCode,
-    city,
     area,
     imgUrl,
     description,
     tel,
     officeHours,
-    hot
+    hot,
+    saleList
   });
-  const createTime = moment(newProduct.createAt).format('YYYY-MM-DD HH:mm:ss');
-  console.log(createTime);
   if (newProduct) {
     ctx.body = {
       code: 'SUC',
@@ -74,6 +91,117 @@ router.post('/addProduct', async (ctx) => {
       code: 'DERR',
       msg: '新增团购信息失败'
     };
+  }
+});
+
+// 编辑团购信息
+router.post('/editProduct', async (ctx) => {
+  const {
+    id,
+    name,
+    type,
+    price,
+    imgUrl,
+    description,
+    tel,
+    officeHours,
+    saleList
+  } = ctx.request.body;
+  if (
+    !id ||
+    !name ||
+    !type ||
+    !price ||
+    !description ||
+    !tel ||
+    !officeHours ||
+    imgUrl.length === 0 ||
+    saleList.length === 0
+  ) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const product = await Product.updateOne({ _id: id }, {
+    name,
+    type,
+    price,
+    imgUrl,
+    description,
+    tel,
+    officeHours,
+    saleList
+  });
+  if (product.n) {
+    ctx.body = {
+      code: 'SUC',
+      msg: '编辑团购信息成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      msg: '编辑团购信息失败'
+    };
+  }
+});
+
+// 删除团购信息 
+router.delete('/deleteProduct', async (ctx) => {
+  const { id } = ctx.request.body;
+  if (!id) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const product = await Product.deleteOne({ 
+    _id: id
+  });
+  if (product.n) {
+    ctx.body = {
+      code: 'SUC',
+      msg: '删除成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      msg: '该商家不存在'
+    }
+  }
+});
+
+// 设置热门团购
+router.post('/setHot', async (ctx) => {
+  const { id, hot, type } = ctx.request.body;
+  if (!id || !type || !hot) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const limit = await Product.find({ type, hot: true });
+  if (limit.length === 3 && hot === '1') {
+    ctx.body = {
+      code: 'CERR',
+      msg: '该类别已有3个热门团购'
+    };
+    return false;
+  }
+  const result = await Product.updateOne({ _id: id }, { hot: hot === '1' });
+  if (result) {
+    ctx.body = {
+      code: 'SUC',
+      msg: hot === '1' ? '设为热门成功' : '取消热门成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      msg: '设为热门失败'
+    }
   }
 });
 
