@@ -144,8 +144,7 @@
           vid="myamap"
           :center="gdMap.center"
           :zoom="gdMap.zoom"
-          :map-manager="gdMap.amapManager"
-          :events="gdMap.events">
+          :map-manager="gdMap.amapManager">
         </el-amap>
       </no-ssr>
     </div>
@@ -212,26 +211,7 @@ export default {
   async mounted() {
     const { data: { data: { areaList: placeList } } } = await queryPlaceList(this.$store.state.geo.choosedCity.adcode);
     this.filterPlace.placeList = placeList;
-    console.log(placeList);
     this.getProductList();
-    const self = this;
-    this.gdMap.events = {
-      init(map) {
-        AMapUI.loadUI(['overlay/SimpleMarker'], (SimpleMarker) =>{
-          self.productList.forEach((item, index) => {
-            const marker = new SimpleMarker({
-              iconStyle: `red-${index + 1}`,
-              iconTheme: 'numv2',
-              map,
-              position: [item.lng, item.lat]
-            });
-            marker.on('click', () => {
-              console.log([item.lng, item.lat]);
-            }, self);
-          });
-        });
-      }
-    }
   },
   methods: {
     /**
@@ -257,7 +237,30 @@ export default {
         this.productList = data.productList;
         this.pageInfo.totalRecords = data.totalRecords;
         this.gdMap.center = [this.productList[0].lng, this.productList[0].lat];
+        this.$refs.amap.$$getInstance().clearMap(); // 清空地图上的覆盖物
+        this.productList.forEach((item) => {
+          const marker = new AMap.Marker({
+            icon: "https://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+            position: [item.lng, item.lat]
+          });
+          this.$refs.amap.$$getInstance().add(marker);
+          const infoWindow = this.createMapWindow(item);
+          marker.on('click', () => {
+            infoWindow.open(this.$refs.amap.$$getInstance(), marker.getPosition());
+          });
+        });
       });
+    },
+    createMapWindow(productInfo) {
+      const content = [
+      ];
+      content.push(`<div style="font-size: 12px;"><p>${productInfo.name}</p>`);
+      content.push(`<p>电话: ${productInfo.tel}  人均: ${productInfo.price}</p>`);
+      content.push(`<p>地址: ${productInfo.address}</p></div>`);
+      const infoWindow = new AMap.InfoWindow({
+        content: content.join("<br>")  //传入 dom 对象，或者 html 字符串
+      });
+      return infoWindow;
     },
     /**
      * @description 处理分页
