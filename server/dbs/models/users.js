@@ -14,6 +14,9 @@ const UserSchema = new Schema({
     type: String,
     required: true
   },
+  avatar: {
+    type: String,
+  },
 }, { timestamps: true })
 
 export default mongoose.model('User', UserSchema)

@@ -22,26 +22,26 @@
         </div>
       </div>
       <div class="header-image">
-        <img :src="productInfo.imgUrl" :alt="productInfo.name">
+        <img :src="productInfo.imgUrl[0]" :alt="productInfo.name">
       </div>
     </div>
     <!-- header -->
     <!-- content -->
     <h2>商家促销优惠</h2>
     <div class="detail-content">
-      <p>4款套餐</p>
+      <p>{{ productInfo.saleList.length }}款套餐</p>
       <ul class="content-list">
-        <li class="list-item">
+        <li class="list-item" v-for="(item, index) in productInfo.saleList" :key="index">
           <div style="display: flex;">
-            <img src="../assets/img/img1.jpg" alt="">
+            <img :src="productInfo.imgUrl[1]" :alt="item.name">
             <div class="item-info">
               <div class="subtitle">
-                <span>眼包温灸</span>
+                <span>{{ item.name }}</span>
                 <i class="iconfont tg-tuan main-color"></i>
               </div>
               <div class="price">
-                <span style="color:#f90">￥<span style="font-size:28px">28</span></span>
-                <span style="margin-left:16px;color:#999;font-size:12px;">门店价180</span>
+                <span style="color:#f90">￥<span style="font-size:28px">{{ item.offPrice}}</span></span>
+                <span style="margin-left:16px;color:#999;font-size:12px;">门店价{{ item.salePrice }}</span>
               </div>
             </div>
           </div>
@@ -51,90 +51,53 @@
     </div>
     <!-- content -->
     <!-- comment -->
-    <h2>网友评论(30条)</h2>
+    <h2>网友评论({{ commentPageInfo.total }}条)</h2>
     <ul class="detail-comment-list">
       <li>
-        <el-radio-group v-model="commentSort" size="small">
-          <el-radio-button label="按时间排序"></el-radio-button>
-          <el-radio-button label="按评分排序"></el-radio-button>
+        <el-radio-group v-model="commentSort" size="small" @change="handleCommentSort">
+          <el-radio-button label="按时间降序"></el-radio-button>
+          <el-radio-button label="按时间升序"></el-radio-button>
+          <el-radio-button label="按评分降序"></el-radio-button>
+          <el-radio-button label="按评分升序"></el-radio-button>
         </el-radio-group>
       </li>
-      <li class="detail-comment">
+      <li class="detail-comment" v-for="(item, index) in commentList" :key="index">
         <div class="user-info">
-          <img src="../assets/img/img1.jpg" alt="">
+          <img :src="item.avatar">
           <div class="info-detail">
-            <span>hpyaeyes</span>
+            <span>{{ item.username }}</span>
             <span style="margin: 4px 0;font-size:14px;color:#666">眼包温灸</span>
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <el-rate
-                v-model="averRate"
+                v-model="item.rate"
                 text-color="#ff9900"
                 disabled
                 allow-half
                 show-score></el-rate>
-              <span style="font-size:12px;color:#999">2019年2月25日</span>
+              <span style="font-size:12px;color:#999">{{ $moment(item.createdAt).fromNow() }}</span>
             </div>
           </div>
         </div>
         <div class="user-comment">
-          好真好，我自己也是戴的眼镜20多年了，然后我也不希望自己的孩子戴眼镜，去体验了之后，嗯，孩子视力降了50度， 我自己也知道中医好，然后店家也很专业，还给我们再次体验，再让我们来第二次体验嗯，我毫不犹豫的下疗程给女儿调理，摘掉眼镜有希望了。
-        </div>
-      </li>
-      <li class="detail-comment">
-        <div class="user-info">
-          <img src="../assets/img/img1.jpg" alt="">
-          <div class="info-detail">
-            <span>hpyaeyes</span>
-            <span style="margin: 4px 0;font-size:14px;color:#666">眼包温灸</span>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <el-rate
-                v-model="averRate"
-                text-color="#ff9900"
-                disabled
-                allow-half
-                show-score></el-rate>
-              <span style="font-size:12px;color:#999">2019年2月25日</span>
-            </div>
-          </div>
-        </div>
-        <div class="user-comment">
-          好真好，我自己也是戴的眼镜20多年了，然后我也不希望自己的孩子戴眼镜，去体验了之后，嗯，孩子视力降了50度， 我自己也知道中医好，然后店家也很专业，还给我们再次体验，再让我们来第二次体验嗯，我毫不犹豫的下疗程给女儿调理，摘掉眼镜有希望了。
-        </div>
-      </li>
-      <li class="detail-comment">
-        <div class="user-info">
-          <img src="../assets/img/img1.jpg" alt="">
-          <div class="info-detail">
-            <span>hpyaeyes</span>
-            <span style="margin: 4px 0;font-size:14px;color:#666">眼包温灸</span>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <el-rate
-                v-model="averRate"
-                text-color="#ff9900"
-                disabled
-                allow-half
-                show-score></el-rate>
-              <span style="font-size:12px;color:#999">2019年2月25日</span>
-            </div>
-          </div>
-        </div>
-        <div class="user-comment">
-          好真好，我自己也是戴的眼镜20多年了，然后我也不希望自己的孩子戴眼镜，去体验了之后，嗯，孩子视力降了50度， 我自己也知道中医好，然后店家也很专业，还给我们再次体验，再让我们来第二次体验嗯，我毫不犹豫的下疗程给女儿调理，摘掉眼镜有希望了。
+          {{ item.content }}
         </div>
       </li>
       <li class="comment-pagination">
         <el-pagination
           layout="prev, pager, next"
-          :total="30">
+          :total="commentPageInfo.total"
+          :current-page.sync="commentPageInfo.pageNum"
+          :page-size="commentPageInfo.pageSize"
+          @current-change="handlePageChange">
         </el-pagination>
       </li>
     </ul>
     <div class="login-user-comment">
       <div>去过悦壹生视力矫正中心？给大家分享体验！</div>
       <div class="user-info">
-        <img src="../assets/img/img1.jpg" alt="">
+        <img :src="$store.state.user.userInfo.avatar" alt="头像">
         <div class="info-detail">
-          <span>hpyaeyes</span>
+          <span>{{ $store.state.user.userInfo.username }}</span>
           <span style="margin: 4px 0;font-size:14px;color:#666">眼包温灸</span>
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <el-rate
@@ -147,7 +110,7 @@
       </div>
       <div class="user-comment">
         <el-input
-        v-model="userComment"
+        v-model.trim="userComment"
         type="textarea"
         :autosize="{ minRows: 3, maxRows: 6}"
         minlength="15"
@@ -156,7 +119,7 @@
         resize="none"></el-input>
         <p v-if="needWords > 0" style="margin: 8px 0;color:#999;font-size:12px">至少需要写15个字哦，还需<span style="color:#409EFF">{{ needWords }}</span>个字</p>
         <p v-else style="margin: 8px 0;color:#999;font-size:12px">您还可以输入<span style="color:#409EFF">{{ applyWords }}</span>个字</p>
-        <el-button type="primary" size="medium">评论</el-button>
+        <el-button type="primary" size="medium" @click="addComment">评论</el-button>
       </div>
     </div>
     <!-- comment -->
@@ -169,7 +132,7 @@
             <p>悦壹生视力矫正中心</p>
             <div class="comment">
               <el-rate
-                v-model="rate"
+                v-model="rate1"
                 disabled
                 allow-half></el-rate>
               <span class="count">22个评价</span>
@@ -184,7 +147,7 @@
             <p>悦壹生视力矫正中心</p>
             <div class="comment">
               <el-rate
-                v-model="rate"
+                v-model="rate2"
                 disabled
                 allow-half></el-rate>
               <span class="count">22个评价</span>
@@ -199,7 +162,7 @@
             <p>悦壹生视力矫正中心</p>
             <div class="comment">
               <el-rate
-                v-model="rate"
+                v-model="rate3"
                 disabled
                 allow-half></el-rate>
               <span class="count">22个评价</span>
@@ -214,7 +177,9 @@
 </template>
 <script>
 import {
-  queryProduct
+  queryProduct,
+  comment,
+  queryCommentList
 } from 'api/product';
 
 export default {
@@ -222,15 +187,25 @@ export default {
   data() {
     return {
       averRate: 4.5,
-      commentSort: '按时间排序',
+      commentSort: '按时间降序',
       userRate: 0,
       userComment: '',
+      rate1: 0,
+      rate2: 0,
+      rate3: 0
     };
   },
   async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
     const { data: { data: productInfo } } = await queryProduct(route.query.id);
+    const { data: { data: { commentList, totalRecords: total } } } = await queryCommentList(route.query.id);
     return {
-      productInfo
+      productInfo,
+      commentList,
+      commentPageInfo: {
+        pageNum: 1,
+        pageSize: 10,
+        total
+      }
     }
   },
   computed: {
@@ -241,6 +216,49 @@ export default {
       return 200 - this.userComment.trim().length;
     }
   },
+  methods: {
+    addComment() {
+      if (this.needWords > 0) {
+        this.$message.error('请至少输入15个字！');
+        return false;
+      }
+      if (this.userRate === 0) {
+        this.$message.error('请评分！');
+        return false;
+      }
+      const query = {
+        userId: this.$store.state.user.userInfo._id,
+        productId: this.$route.query.id,
+        content: this.userComment,
+        rate: this.userRate,
+        username: this.$store.state.user.userInfo.username,
+        avatar: this.$store.state.user.userInfo.avatar
+      }
+      comment(query).then((resp) => {
+        this.$message.success(resp.data.msg);
+        setTimeout(() => {
+          location.reload();
+        }, 1000);
+      });
+    },
+    getCommentList() {
+      const id = this.$route.query.id;
+      const { pageNum, pageSize } = this.commentPageInfo;
+      const sort = this.commentSort;
+      queryCommentList(id, pageNum, pageSize, sort).then((resp) => {
+        const { data } = resp.data;
+        this.commentList = data.commentList;
+        this.commentPageInfo.total = data.totalRecords;
+      });
+    },
+    handleCommentSort() {
+      this.commentPageInfo.pageNum = 1;
+      this.getCommentList();
+    },
+    handlePageChange() {
+      this.getCommentList();
+    }
+  }
 }
 </script>
 <style lang="scss">

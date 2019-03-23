@@ -1,10 +1,10 @@
 import Type from '../dbs/models/types';
 import Product from '../dbs/models/products';
 import Router from 'koa-router';
-import moment from 'moment';
-import 'moment/locale/zh-cn';
+import axios from './utils/axios';
 
-moment.locale('zh-cn');
+const geoUrl = 'https://restapi.amap.com/v3/geocode/geo'; // 地理编码api的url
+const gdKey = '79e721e2dd35b49aa2a1a3a17d038451'; // 高德api密钥
 
 let router = new Router({
   prefix: '/product'
@@ -65,6 +65,24 @@ router.post('/addProduct', async (ctx) => {
     };
     return false;
   }
+  const { data: { status, geocodes } } = await axios.get(geoUrl, {
+    params: {
+      key: gdKey,
+      adcode,
+      address
+    }
+  });
+  let lng, lat;
+  if (status === '1') {
+    lng = geocodes[0].location.split(',')[0];
+    lat = geocodes[0].location.split(',')[1];
+  } else {
+    ctx.body = {
+      code: 'SERR',
+      msg: '获取地理编码信息失败'
+    };
+    return false;
+  }
   const newProduct = await Product.create({
     name,
     type,
@@ -79,7 +97,9 @@ router.post('/addProduct', async (ctx) => {
     tel,
     officeHours,
     hot,
-    saleList
+    saleList,
+    lng,
+    lat
   });
   if (newProduct) {
     ctx.body = {
@@ -216,11 +236,11 @@ router.get('/getProductList', async (ctx) => {
     return false;
   }
   const filterBy = [ // sort: 0为创建时间降序，1为价格降序，2为价格升序，3为人气降序
-    { createAt: 'desc'},
+    { createdAt: 'desc'},
     { price: 'desc'},
     { price: 'asc'},
     { averRate: 'desc'},
-  ]
+  ];
   const params = { cityCode };
   if (adcode) {
     params.adcode = adcode;

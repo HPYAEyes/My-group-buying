@@ -44,6 +44,9 @@ module.exports = {
     {
       src: '@/plugins/amap',
       ssr: false
+    },
+    {
+      src: '@/plugins/moment',
     }
   ],
 

@@ -9,6 +9,8 @@ import users from './interface/users';
 import geo from './interface/geo';
 import product from './interface/product';
 import admin from './interface/adminusers';
+import comment from './interface/comment';
+import { scheduleCronstyle } from './schedule';
 
 const Koa = require('koa')
 const cors = require('koa2-cors')
@@ -58,6 +60,7 @@ async function start() {
   app.use(geo.routes()).use(geo.allowedMethods())
   app.use(product.routes()).use(product.allowedMethods())
   app.use(admin.routes()).use(admin.allowedMethods())
+  app.use(comment.routes()).use(comment.allowedMethods())
 
   app.use(ctx => {
     ctx.status = 200 // koa defaults to 404 when it sees that status is unset
@@ -77,6 +80,8 @@ async function start() {
     message: `Server listening on http://${host}:${port}`,
     badge: true
   })
+
+  scheduleCronstyle();
 }
 
 start()

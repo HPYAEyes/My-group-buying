@@ -33,3 +33,25 @@ export function queryProductList({
 export function queryProduct(id) {
   return request.get(`/product/getProduct?id=${id}`);
 }
+
+export function comment({
+  userId,
+  productId,
+  rate,
+  content,
+  username,
+  avatar
+}) {
+  return request.post('/comment/addComment', {
+    userId,
+    productId,
+    rate,
+    content,
+    username,
+    avatar
+  });
+}
+
+export function queryCommentList(productId, pageNum = 1, pageSize = 10, sort) {
+  return request.get(`/comment/getCommentList?pageNum=${pageNum}&pageSize=${pageSize}&productId=${productId}&sort=${sort}`);
+}

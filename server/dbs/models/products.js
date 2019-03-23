@@ -63,37 +63,11 @@ const ProductSchema = new Schema({
     default: false,
     required: true
   },
-  comments: [
-    {
-      userId: {
-        type: mongoose.ObjectId,
-        required: true
-      },
-      rate: {
-        type: Number,
-        default: 0,
-        min: 0,
-        max: 5,
-        required: true
-      },
-      content: {
-        type: String,
-        minlength: 15,
-        maxlength: 200,
-        required: true
-      },
-      createTime: {
-        type: Date,
-        default: Date.now,
-        required: true
-      },
-      updateTime: {
-        type: Date,
-        default: Date.now,
-        required: true
-      },
-    }
-  ],
+  commentCount: {
+    type: Number,
+    default: 0,
+    required: true
+  },
   saleList: [
     {
       name: {
@@ -109,7 +83,15 @@ const ProductSchema = new Schema({
         required: true
       },
     }
-  ]
+  ],
+  lng: {
+    type: String,
+    required: true
+  },
+  lat: {
+    type: String,
+    required: true
+  }
 }, { timestamps: true })
 
 export default mongoose.model('Product', ProductSchema)

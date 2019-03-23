@@ -50,7 +50,8 @@ router.post('/signup', async (ctx) => {
   let newUser = await User.create({
     username,
     password,
-    email
+    email,
+    avatar: 'http://localhost:3333/ec595be91553326938440.png'
   });
   if (newUser) {
     let res = await axios.post('/users/signin', {
@@ -189,17 +190,21 @@ router.get('/signout', async (ctx, next) => {
 // 获取用户信息
 router.get('/getUser', async (ctx) => {
   if (ctx.isAuthenticated()) {
-    const { username, email } = ctx.session.passport.user;
+    const { username, email, _id, avatar } = ctx.session.passport.user;
     ctx.body = {
       code: 'SUC',
       username,
-      email
+      email,
+      _id,
+      avatar
     };
   } else {
     ctx.body = {
       code: 'SUC',
       username: '',
-      email: ''
+      email: '',
+      _id: '',
+      avatar: ''
     };
   }
 });

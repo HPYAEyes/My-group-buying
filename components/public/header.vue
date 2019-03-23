@@ -112,7 +112,6 @@ import {
   getChkCode,
   register,
   login,
-  getUser,
   logout,
   getCity
 } from 'api/index';
@@ -208,8 +207,7 @@ export default {
   async mounted() {
     this.choosedCity = JSON.parse(window.localStorage.getItem('districts'));
     this.setChoosedCity(this.choosedCity);
-    const { data: { username } } = await getUser();
-    this.username = username;
+    this.username = this.$store.state.user.userInfo.username ? this.$store.state.user.userInfo.username : '';
   },
   computed: {
     ...mapState({

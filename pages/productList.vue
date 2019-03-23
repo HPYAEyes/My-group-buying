@@ -46,7 +46,7 @@
           class="product-item"
           v-for="item in productList"
           :key="item._id">
-          <nuxt-link :to="'/productDetail?id=' + item._id"><img class="item-img" :src="item.imgUrl" :alt="item.name"></nuxt-link>
+          <nuxt-link :to="'/productDetail?id=' + item._id"><img class="item-img" :src="item.imgUrl[0]" :alt="item.name"></nuxt-link>
           <div class="item-content">
             <nuxt-link class="item-header" :to="'/productDetail?id=' + item._id">{{ item.name }}</nuxt-link>
             <div class="item-comment">
@@ -56,7 +56,7 @@
                 disabled
                 allow-half
                 show-score></el-rate>
-              <span style="color:#409eff">{{ item.comments.length }}人评论</span>
+              <span style="color:#409eff">{{ item.commentCount }}人评论</span>
             </div>
             <div class="item-place">
               <span>{{ item.type }}</span>
@@ -173,10 +173,6 @@ export default {
         center: ['121.59996', '31.197646'],
         amapManager: AMapManager,
       },
-      marker: {
-        position: ['121.59996', '31.197646'],
-        template: '<span>1</span>'
-      },
       filterPlace: {
         choosedPlace: '全部',
         placeList: [],
@@ -222,16 +218,17 @@ export default {
     this.gdMap.events = {
       init(map) {
         AMapUI.loadUI(['overlay/SimpleMarker'], (SimpleMarker) =>{
-          console.log(self);
-          const marker = new SimpleMarker({
-            iconStyle: 'red-1',
-            iconTheme: 'numv2',
-            map: map,
-            position: map.getCenter()
+          self.productList.forEach((item, index) => {
+            const marker = new SimpleMarker({
+              iconStyle: `red-${index + 1}`,
+              iconTheme: 'numv2',
+              map,
+              position: [item.lng, item.lat]
+            });
+            marker.on('click', () => {
+              console.log([item.lng, item.lat]);
+            }, self);
           });
-          marker.on('click', () => {
-            console.log(map.getCenter());
-          }, self);
         });
       }
     }
@@ -259,6 +256,7 @@ export default {
         const { data } = resp.data;
         this.productList = data.productList;
         this.pageInfo.totalRecords = data.totalRecords;
+        this.gdMap.center = [this.productList[0].lng, this.productList[0].lat];
       });
     },
     /**
@@ -290,7 +288,6 @@ export default {
 
 .product-list-container {
   width: 1200px;
-  min-height: 100vh;
   margin: 0 auto;
   display: flex;
   flex-wrap: wrap;
@@ -327,6 +324,7 @@ export default {
   .product {
     position: relative;
     width: 75%;
+    min-height: 100vh;
     margin-right: 16px;
     margin-bottom: 16px;
     padding: 0 20px;
