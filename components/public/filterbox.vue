@@ -32,8 +32,8 @@ export default {
       this.$set(this.activeList, this.lastIndex, false);
       this.$set(this.activeList, index, true);
       this.lastIndex = index;
-      this.$emit('change', val);
       this.$emit('update:default', val === '全部' ? '全部' : val[this.value]);
+      this.$emit('change', val);
     }
   }
 }

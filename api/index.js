@@ -45,3 +45,11 @@ export function getCity(adcode) {
 export function getHotArea(adcode, hot) {
   return request.get(`/geo/getArea?adcode=${adcode}&hot=${hot}&subdistrict=1`);
 }
+
+export function getNewProduct() {
+  return request.get('/product/getNewProduct');
+}
+
+export function getNewComments() {
+  return request.get('/comment/getNewComments');
+}

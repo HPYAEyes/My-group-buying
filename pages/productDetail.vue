@@ -63,9 +63,9 @@
       </li>
       <li class="detail-comment" v-for="(item, index) in commentList" :key="index">
         <div class="user-info">
-          <img :src="item.avatar">
+          <img :src="item.userId.avatar">
           <div class="info-detail">
-            <span>{{ item.username }}</span>
+            <span>{{ item.userId.username }}</span>
             <span style="margin: 4px 0;font-size:14px;color:#666">眼包温灸</span>
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <el-rate
@@ -231,8 +231,6 @@ export default {
         productId: this.$route.query.id,
         content: this.userComment,
         rate: this.userRate,
-        username: this.$store.state.user.userInfo.username,
-        avatar: this.$store.state.user.userInfo.avatar
       }
       comment(query).then((resp) => {
         this.$message.success(resp.data.msg);

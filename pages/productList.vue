@@ -34,11 +34,11 @@
     <!-- filter end -->
     <div class="product">
       <div class="product-header">
-        <el-radio-group v-model="listSort" size="small">
-          <el-radio-button label="默认"></el-radio-button>
-          <el-radio-button label="价格排序"></el-radio-button>
+        <el-radio-group v-model="listSort" size="small" @change="handleSortChange">
           <el-radio-button label="人气最高"></el-radio-button>
-          <el-radio-button label="评价最高"></el-radio-button>
+          <el-radio-button label="评价最多"></el-radio-button>
+          <el-radio-button label="价格降序"></el-radio-button>
+          <el-radio-button label="价格升序"></el-radio-button>
         </el-radio-group>
       </div>
       <ul class="product-list">
@@ -172,18 +172,6 @@ export default {
         center: ['121.59996', '31.197646'],
         amapManager: AMapManager,
       },
-      filterPlace: {
-        choosedPlace: '全部',
-        placeList: [],
-        label: 'name',
-        value: 'adcode'
-      },
-      filterStreet: {
-        choosedStreet: '全部',
-        streetList: [],
-        label: 'name',
-        value: 'name'
-      },
       productList: [],
       pageInfo: {
         pageSize: 12,
@@ -191,26 +179,47 @@ export default {
         totalRecords: 0
       },
       rate: 4.5,
-      listSort: '默认'
+      listSort: '人气最高'
     };
   },
   components: {
     Filterbox
   },
-  async asyncData({ store }) {
+  async asyncData({ route, store }) {
     const { data: { data: typeList } } = await queryTypeList();
+    const { data: { data: { areaList: placeList } } } = await queryPlaceList(store.state.geo.choosedCity.adcode);
+    let streetList;
+    if (route.query.adcode) {
+      const streetIndex = placeList.findIndex((item) => route.query.adcode === item.adcode);
+      streetList = placeList[streetIndex].districts;
+    } else {
+      streetList = [];
+    }
     return {
       filterType: {
-        choosedType: '全部',
+        choosedType: route.query.type || '全部',
         typeList,
+        label: 'name',
+        value: 'name'
+      },
+      filterPlace: {
+        choosedPlace: route.query.adcode || '全部',
+        placeList,
+        label: 'name',
+        value: 'adcode'
+      },
+      filterStreet: {
+        choosedStreet: '全部',
+        streetList,
         label: 'name',
         value: 'name'
       },
     }
   },
   async mounted() {
-    const { data: { data: { areaList: placeList } } } = await queryPlaceList(this.$store.state.geo.choosedCity.adcode);
-    this.filterPlace.placeList = placeList;
+    // const { data: { data: { areaList: placeList } } } = await queryPlaceList(this.$store.state.geo.choosedCity.adcode);
+    // this.filterPlace.placeList = placeList;
+    // this.filterPlace.choosedPlace = this.$route.query.adcode;
     this.getProductList();
   },
   methods: {
@@ -221,8 +230,7 @@ export default {
       const type = this.filterType.choosedType === '全部' ? undefined : this.filterType.choosedType;
       const street = this.filterStreet.choosedStreet === '全部' ? undefined : this.filterStreet.choosedStreet;
       const adcode = this.filterPlace.choosedPlace === '全部' ? undefined : this.filterPlace.choosedPlace;
-      // TODO sort
-      const sort = 0;
+      const sort = this.listSort;
       const params = {
         pageNum: this.pageInfo.pageNum,
         pageSize: this.pageInfo.pageSize,
@@ -268,19 +276,31 @@ export default {
     handlePageChange() {
       this.getProductList();
     },
+    /**
+     * @description 处理排序
+     */
+    handleSortChange() {
+      this.getProductList();
+    },
+    /**
+     * @description 处理分类
+     */
     handleTypeChange(val) {
-      console.log(val);
+      this.getProductList();
     },
     /**
      * @description 选择的地点改变时的处理
      */
     handlePlaceChange(val) {
-      console.log(val);
       this.filterStreet.choosedStreet = '全部';
       this.filterStreet.streetList = val === '全部' ? [] : val.districts;
+      this.getProductList();
     },
+    /**
+     * @description 处理街道改变
+     */
     handleStreetChange(val) {
-      console.log(val);
+      this.getProductList();
     }
 
   }

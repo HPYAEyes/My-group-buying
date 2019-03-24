@@ -26,6 +26,15 @@ const store = () => new Vuex.Store({
       commit('geo/setCityList', cityStatus === 200 ? provinceList : []);
       const { status: hotStatus, data: { data: { districts } } } = await app.$axios.get('/geo/getHotCity');
       commit('geo/setHotCity', hotStatus === 200 ? districts : []);
+      const { data: { data: firstTab } } = await app.$axios.get('/product/getHotProduct', { params: { type: '桌游'} });
+      const { data: { data: secondTab } } = await app.$axios.get('/product/getHotProduct', { params: { type: '密室'} });
+      const { data: { data: thirdTab } } = await app.$axios.get('/product/getHotProduct', { params: { type: '按摩/足疗'} });
+      const hotProduct = {
+        firstTab,
+        secondTab,
+        thirdTab
+      };
+      commit('product/setHotProduct', hotProduct);
     }
   }
 });

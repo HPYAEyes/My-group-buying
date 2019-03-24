@@ -7,8 +7,8 @@ let router = new Router({
 
 // 新增评论
 router.post('/addComment', async (ctx) => {
-  const { userId, productId, content, rate, username, avatar } = ctx.request.body;
-  if (!userId || !productId || !content || !rate || !username || !avatar) {
+  const { userId, productId, content, rate } = ctx.request.body;
+  if (!userId || !productId || !content || !rate) {
     ctx.body = {
       code: 'CERR',
       msg: '参数有误'
@@ -20,8 +20,6 @@ router.post('/addComment', async (ctx) => {
     productId,
     rate,
     content,
-    username,
-    avatar
   });
   if (comment) {
     ctx.body = {
@@ -52,7 +50,7 @@ router.get('/getCommentList', async (ctx) => {
     '按评分降序': { rate: 'desc'},
     '按评分升序': { rate: 'asc'},
   };
-  const comment = await Comment.find({ productId }).skip((pageNum - 1) * pageSize).limit(Number(pageSize)).sort(filterBy[sort]).exec();
+  const comment = await Comment.find({ productId }).populate('userId', 'username avatar').skip((pageNum - 1) * pageSize).limit(Number(pageSize)).sort(filterBy[sort]).exec();
   const totalRecords = await Comment.countDocuments({ productId });
   if (comment && totalRecords !== undefined) {
     ctx.body = {
@@ -95,6 +93,24 @@ router.delete('/deleteComment', async (ctx) => {
       code: 'SERR',
       msg: '删除评论失败'
     }
+  }
+});
+
+// 获取首页最新评论(5条)
+router.get('/getNewComments', async (ctx) => {
+  const data = await Comment.find().populate('productId', 'name type imgUrl').populate('userId', 'username').sort({ createdAt: 'desc' }).limit(5).exec();
+  if (data) {
+    ctx.body = {
+      code: 'SUC',
+      data,
+      msg: '获取首页最新评论成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      data: null,
+      msg: '获取首页最新评论失败'
+    };
   }
 });
 

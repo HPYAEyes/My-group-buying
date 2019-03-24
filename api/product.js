@@ -39,16 +39,12 @@ export function comment({
   productId,
   rate,
   content,
-  username,
-  avatar
 }) {
   return request.post('/comment/addComment', {
     userId,
     productId,
     rate,
     content,
-    username,
-    avatar
   });
 }
 

@@ -11,10 +11,10 @@
             <span>休闲</span>
           </div>
           <ul class="card-container-main">
-            <li>酒吧</li>
             <li>私人影院</li>
-            <li>茶馆</li>
-            <li>DIY手工坊</li>
+            <li>密室</li>
+            <li>团建扩展</li>
+            <li>棋牌室</li>
           </ul>
         </div>
         <div class="card-container">
@@ -23,11 +23,10 @@
             <span>娱乐</span>
           </div>
           <ul class="card-container-main">
-            <li>K歌</li>
-            <li>密室</li>
+            <li>KTV</li>
             <li>桌游</li>
-            <li>轰趴馆</li>
-            <li>游乐游艺</li>
+            <li>网吧/电竞</li>
+            <li>VR</li>
           </ul>
         </div>
         <div class="card-container">
@@ -36,10 +35,9 @@
             <span>运动</span>
           </div>
           <ul class="card-container-main">
-            <li>健身中心</li>
-            <li>游泳馆</li>
-            <li>溜冰场</li>
-            <li>羽毛球馆</li>
+            <li>运动健身</li>
+            <li>轰趴馆</li>
+            <li>新奇体验</li>
           </ul>
         </div>
         <div class="card-container">
@@ -48,17 +46,17 @@
             <span>文化</span>
           </div>
           <ul class="card-container-main">
-            <li>博物馆</li>
-            <li>美术馆</li>
-            <li>图书馆</li>
-            <li>创意园区</li>
             <li>文化艺术</li>
+            <li>采摘/农家乐</li>
+            <li>游乐游艺</li>
+            <li>茶馆</li>
+            <li>DIY手工坊</li>
           </ul>
         </div>
         <div class="card-container">
           <div class="card-container-title">
             <i class="iconfont tg-yangsheng"></i>
-            <span>休闲</span>
+            <span>养生</span>
           </div>
           <ul class="card-container-main">
             <li>按摩/足疗</li>
@@ -68,8 +66,12 @@
       </div>
       <dl class="card-footer">
         <dt>热门地区：</dt>
-        <dd v-for="item in areaList" :key="item.adcode">{{ item.name }}</dd>
-        <a class="more-info" href="" style="margin: 0;position:absolute;right:36px;">更多</a>
+        <dd
+          v-for="item in areaList"
+          :key="item.adcode"
+          style="cursor:pointer"
+          @click="$router.push({ path:'/productList', query: { adcode: item.adcode }})">{{ item.name }}</dd>
+        <nuxt-link to="/productList" class="more-info" style="margin: 0;position:absolute;right:36px;">更多</nuxt-link>
       </dl>
     </div>
     <div class="section-card">
@@ -98,25 +100,25 @@
           </ul>
           <a class="more-info" href="#">更多桌游</a>
         </el-tab-pane>
-        <el-tab-pane class="tabs-container" label="酒吧" name="second">配置管理</el-tab-pane>
+        <el-tab-pane class="tabs-container" label="密室" name="second">配置管理</el-tab-pane>
         <el-tab-pane class="tabs-container" label="按摩/足疗" name="third">角色管理</el-tab-pane>
       </el-tabs>
     </div>
     <div class="section-card">
       <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
         <span>最新团购</span>
-        <a class="more-info" href="" style="margin: 0 16px 0 0;">更多休闲娱乐团购</a>
+        <nuxt-link to="/productList" class="more-info" style="margin: 0 16px 0 0;">更多休闲娱乐团购</nuxt-link>
       </div>
       <ul class="newest-list">
-        <li v-for="item in newBuyList" :key="item.title">
+        <li v-for="item in newProductList" :key="item._id">
           <el-card class="list-el-card" shadow="always">
-            <img src="../assets/img/img1.jpg" alt="">
-            <div>
-              <p>{{item.title}}</p>
-              <p>原价 ￥{{item.oldPrice}}</p>
-              <p class="new-price">团购价<span>￥{{item.newPrice}}</span></p>
+            <img :src="item.imgUrl[0]" :alt="item.name">
+            <div class="card-description">
+              <p>{{ item.name }}&nbsp;&nbsp;|&nbsp;&nbsp;{{ item.saleList[0].name }}</p>
+              <p>原价 ￥{{ item.saleList[0].salePrice }}</p>
+              <p class="new-price">团购价<span>￥{{ item.saleList[0].offPrice }}</span></p>
             </div>
-            <el-button class="navigate-btn" type="primary" size="mini" round>去看看</el-button>
+            <el-button class="navigate-btn" type="primary" size="mini" round @click="toProductPage(item._id)">去看看</el-button>
           </el-card>
         </li>
       </ul>
@@ -126,17 +128,22 @@
         <span>最新点评</span>
       </div>
       <ul class="newest-comment-list">
-        <li v-for="item in newCommentList" :key="item.userName">
+        <li v-for="item in newCommentList" :key="item._id">
           <div class="comment-header">
-            <img src="../assets/img/img1.jpg" alt="">
+            <img :src="item.productId.imgUrl[0]" alt="用户头像">
             <div>
-              <p>{{item.shopName}}</p>
-              <el-tag size="medium" style="position: absolute;bottom:0;">{{item.tag}}</el-tag>
+              <el-tooltip 
+                effect="dark"
+                :content="item.productId.name"
+                placement="top">
+                <p class="comment-shopname">{{item.productId.name}}</p>
+              </el-tooltip>
+              <el-tag size="medium" style="position: absolute;bottom:0;">{{ item.productId.type }}</el-tag>
             </div>
           </div>
           <el-card class="comment-content" shadow="always">
-            <span class="comment-user">{{item.userName}}</span>
-            <span class="comment-time">{{item.updateTime}}点评：</span>
+            <span class="comment-user">{{ item.userId.username }}</span>
+            <span class="comment-time">{{ $moment(item.createdAt).fromNow() }}点评：</span>
             <p>{{item.content}}</p>
             <el-rate
               v-model="item.rate"
@@ -151,7 +158,9 @@
 <script>
 import { createNamespacedHelpers  } from 'vuex';
 import {
-  getHotArea
+  getHotArea,
+  getNewProduct,
+  getNewComments
 } from 'api/index';
 
 const { mapState, mapActions } = createNamespacedHelpers('geo');
@@ -254,9 +263,27 @@ export default {
       ]
     };
   },
+  async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
+    const { data: { data: newProductList } } = await getNewProduct();
+    const { data: { data: newCommentList } } = await getNewComments();
+    return {
+      newProductList,
+      newCommentList
+    };
+  },
   async mounted() {
     const { data: { data: { areaList } } } = await getHotArea(this.cityAdcode, true);
     this.setHotArea(areaList);
+    document.querySelectorAll('.card-container-main').forEach((item) => {
+      item.addEventListener('click', (event) => {
+        this.$router.push({
+          path: 'productList',
+          query: {
+            type: event.target.innerText
+          }
+        });
+      });
+    });
   },
   computed: {
     ...mapState({
@@ -267,7 +294,15 @@ export default {
   methods: {
     ...mapActions([
       'setHotArea'
-    ])
+    ]),
+    toProductPage(id) {
+      this.$router.push({
+        path: 'productDetail',
+        query: {
+          id
+        }
+      });
+    }
   }
 }
 </script>
@@ -322,13 +357,13 @@ export default {
         flex-wrap: wrap;
         margin-top: 16px;
         padding: 0;
-        
 
         li {
           padding-right: 16px;
           padding-bottom: 10px;
           color: $greyFont;
           font-size: 14px;
+          cursor: pointer;
         }
       }
     }
@@ -408,11 +443,14 @@ export default {
           margin-right: 14px;
         }
 
+        .card-description {
+          justify-content: space-between;
+        }
+
         div {
           position: relative;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
           font-size: 14px;
         
           p {
@@ -455,10 +493,18 @@ export default {
         position: relative;
         display: flex;
 
+        .comment-shopname {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          width: 105px;
+        }
+
         img {
           width: 100px;
           height: 60px;
           margin-right: 14px;
+          border-radius: 4px;
         }
         
         p {

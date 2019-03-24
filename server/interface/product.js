@@ -204,10 +204,10 @@ router.post('/setHot', async (ctx) => {
     return false;
   }
   const limit = await Product.find({ type, hot: true });
-  if (limit.length === 3 && hot === '1') {
+  if (limit.length === 5 && hot === '1') {
     ctx.body = {
       code: 'CERR',
-      msg: '该类别已有3个热门团购'
+      msg: '该类别已有5个热门团购'
     };
     return false;
   }
@@ -235,12 +235,12 @@ router.get('/getProductList', async (ctx) => {
     };
     return false;
   }
-  const filterBy = [ // sort: 0为创建时间降序，1为价格降序，2为价格升序，3为人气降序
-    { createdAt: 'desc'},
-    { price: 'desc'},
-    { price: 'asc'},
-    { averRate: 'desc'},
-  ];
+  const filterBy = {
+    '人气最高': { averRate: 'desc'},
+    '评价最多': { commentCount: 'desc'},
+    '价格降序': { price: 'desc'},
+    '价格升序': { price: 'asc'},
+  }
   const params = { cityCode };
   if (adcode) {
     params.adcode = adcode;
@@ -294,6 +294,50 @@ router.get('/getProduct', async (ctx)=> {
       code: 'DERR',
       data: product,
       msg: '获取团购信息详情失败'
+    };
+  }
+});
+
+// 获取热门团购信息
+router.get('/getHotProduct', async (ctx) => {
+  const { type } = ctx.query;
+  if (!type) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const data = await Product.find({ type, hot: true }).limit(5).exec();
+  if (data) {
+    ctx.body = {
+      code: 'SUC',
+      data,
+      msg: '获取热门团购信息成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      data: null,
+      msg: '获取热门团购信息成功'
+    };
+  }
+});
+
+// 获取最新团购信息(4条)
+router.get('/getNewProduct', async (ctx) => {
+  const data = await Product.find().sort({ createdAt: 'desc' }).limit(4).exec();
+  if (data) {
+    ctx.body = {
+      code: 'SUC',
+      data,
+      msg: '获取最新团购信息成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      data: null,
+      msg: '获取最新团购信息失败'
     };
   }
 });

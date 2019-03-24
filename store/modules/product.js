@@ -1,16 +1,16 @@
 const state = () => ({
-  typeList: []
+  hotProduct: []
 });
 
 const mutations = {
-  setTypeList(state, val) {
-    state.typeList = val;
+  setHotProduct(state, val) {
+    state.hotProduct = val;
   },
 };
 
 const actions = {
-  setTypeList({ commit }, typeList) {
-    commit('typeList', typeList);
+  setTypeList({ commit }, hotProduct) {
+    commit('setHotProduct', typehotProductList);
   },
 };
 

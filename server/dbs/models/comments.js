@@ -3,19 +3,13 @@ const Schema = mongoose.Schema
 const CommentSchema = new Schema({
   userId: {
     type: mongoose.ObjectId,
-    required: true
-  },
-  username: {
-    type: String,
-    required: true
-  },
-  avatar: {
-    type: String,
-    required: true
+    required: true,
+    ref: 'User'
   },
   productId: {
     type: mongoose.ObjectId,
-    required: true
+    required: true,
+    ref: 'Product'
   },
   rate: {
     type: Number,

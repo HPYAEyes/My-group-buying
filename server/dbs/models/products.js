@@ -46,12 +46,12 @@ const ProductSchema = new Schema({
   },
   description: {
     type: String,
-    maxlength: 100,
+    maxlength: 150,
     required: true
   },
   tel: {
     type: String,
-    maxlength: 13,
+    maxlength: 50,
     required: true
   },
   officeHours: {
