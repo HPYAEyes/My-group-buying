@@ -92,7 +92,7 @@
         </el-pagination>
       </li>
     </ul>
-    <div class="login-user-comment">
+    <div class="login-user-comment" v-if="$store.state.user.userInfo.username">
       <div>去过悦壹生视力矫正中心？给大家分享体验！</div>
       <div class="user-info">
         <img :src="$store.state.user.userInfo.avatar" alt="头像">
@@ -126,50 +126,20 @@
     <div class="product-recommand hot-recommand">
       <p>近期热门推荐</p>
       <ul>
-        <li>
-          <a href="#">
-            <img src="../assets/img/img1.jpg" alt="">
-            <p>悦壹生视力矫正中心</p>
+        <li v-for="item in recommand" :key="item._id">
+          <nuxt-link :to="{ path: '/productDetail', query: { id: item._id }}">
+            <img :src="item.imgUrl[0]" :alt="item.name">
+            <p>{{ item.name }}</p>
             <div class="comment">
               <el-rate
-                v-model="rate1"
+                v-model="item.averRate"
                 disabled
                 allow-half></el-rate>
-              <span class="count">22个评价</span>
+              <span class="count">{{ item.commentCount }}个评价</span>
             </div>
-            <p class="address">北景园</p>
-            <p class="price">人均￥<span>92</span></p>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <img src="../assets/img/img1.jpg" alt="">
-            <p>悦壹生视力矫正中心</p>
-            <div class="comment">
-              <el-rate
-                v-model="rate2"
-                disabled
-                allow-half></el-rate>
-              <span class="count">22个评价</span>
-            </div>
-            <p class="address">北景园</p>
-            <p class="price">人均￥<span>92</span></p>
-          </a>
-        </li>
-        <li>
-          <a href="#">
-            <img src="../assets/img/img1.jpg" alt="">
-            <p>悦壹生视力矫正中心</p>
-            <div class="comment">
-              <el-rate
-                v-model="rate3"
-                disabled
-                allow-half></el-rate>
-              <span class="count">22个评价</span>
-            </div>
-            <p class="address">北景园</p>
-            <p class="price">人均￥<span>92</span></p>
-          </a>
+            <p class="address">{{ item.street }}</p>
+            <p class="price">人均￥<span>{{ item.price }}</span></p>
+          </nuxt-link>
         </li>
       </ul>
     </div>
@@ -190,14 +160,15 @@ export default {
       commentSort: '按时间降序',
       userRate: 0,
       userComment: '',
-      rate1: 0,
-      rate2: 0,
-      rate3: 0
     };
   },
   async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
     const { data: { data: productInfo } } = await queryProduct(route.query.id);
     const { data: { data: { commentList, totalRecords: total } } } = await queryCommentList(route.query.id);
+    const firstList = store.state.product.hotProduct.firstTab.slice(0, 3);
+    const secondList = store.state.product.hotProduct.secondTab.slice(0, 3);
+    const thirdList = store.state.product.hotProduct.thirdTab.slice(0, 3);
+    const recommand = firstList.concat(secondList, thirdList);
     return {
       productInfo,
       commentList,
@@ -205,7 +176,8 @@ export default {
         pageNum: 1,
         pageSize: 10,
         total
-      }
+      },
+      recommand
     }
   },
   computed: {
@@ -214,6 +186,13 @@ export default {
     },
     applyWords() {
       return 200 - this.userComment.trim().length;
+    }
+  },
+  watch: {
+    $route(to, from) {
+      if (to.query.id !== from.query.id) {
+        location.reload()
+      }
     }
   },
   methods: {
@@ -273,6 +252,7 @@ export default {
     position: absolute;
     top: 400px;
     right: 0;
+    margin-bottom: 20px;
     border: 1px solid $border;
     border-radius: 4px;
   }

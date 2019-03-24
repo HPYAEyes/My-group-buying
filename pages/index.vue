@@ -85,23 +85,69 @@
         type="card">
         <el-tab-pane class="tabs-container" label="桌游" name="first">
           <ul class="pic-list">
-            <li v-for="item in firstTab" :key="item.name">
-              <a href=""><img src="../assets/img/img1.jpg" alt=""></a>
-              <span>{{item.name}}</span>
+            <li v-for="item in firstList" :key="item.name">
+              <nuxt-link :to="{ path: '/productDetail', query: { id: item._id }}"><img :src="item.imgUrl[0]" :alt="item.name"></nuxt-link>
+              <el-tooltip 
+                effect="dark"
+                :content="item.name"
+                placement="top">
+                <span class="pic-shopname">{{ item.name }}</span>
+              </el-tooltip>
               <el-rate
-                v-model="item.rate"
+                v-model="item.averRate"
                 text-color="#ff9900"
                 disabled
                 allow-half
                 show-score>
               </el-rate>
-              <span>{{item.count}}人评分</span>
+              <span>{{ item.commentCount }}人评分</span>
             </li>
           </ul>
-          <a class="more-info" href="#">更多桌游</a>
+          <nuxt-link class="more-info" :to="{ path: '/productList', query: {type: '桌游'}}">更多桌游</nuxt-link>
         </el-tab-pane>
-        <el-tab-pane class="tabs-container" label="密室" name="second">配置管理</el-tab-pane>
-        <el-tab-pane class="tabs-container" label="按摩/足疗" name="third">角色管理</el-tab-pane>
+        <el-tab-pane class="tabs-container" label="密室" name="second">
+          <ul class="pic-list">
+            <li v-for="item in secondList" :key="item.name">
+              <nuxt-link :to="{ path: '/productDetail', query: { id: item._id }}"><img :src="item.imgUrl[0]" :alt="item.name"></nuxt-link>
+              <el-tooltip 
+                effect="dark"
+                :content="item.name"
+                placement="top">
+                <span class="pic-shopname">{{ item.name }}</span>
+              </el-tooltip>
+              <el-rate
+                v-model="item.averRate"
+                text-color="#ff9900"
+                disabled
+                allow-half
+                show-score>
+              </el-rate>
+              <span>{{ item.commentCount }}人评分</span>
+            </li>
+          </ul>
+          <nuxt-link class="more-info" :to="{ path: '/productList', query: {type: '密室'}}">更多密室</nuxt-link>
+        </el-tab-pane>
+        <el-tab-pane class="tabs-container" label="按摩/足疗" name="third">
+          <ul class="pic-list">
+            <li v-for="item in thirdList" :key="item.name">
+              <nuxt-link :to="{ path: '/productDetail', query: { id: item._id }}"><img :src="item.imgUrl[0]" :alt="item.name"></nuxt-link>
+              <el-tooltip 
+                effect="dark"
+                :content="item.name"
+                placement="top">
+                <span class="pic-shopname">{{ item.name }}</span>
+              </el-tooltip>
+              <el-rate
+                v-model="item.averRate"
+                text-color="#ff9900"
+                disabled
+                allow-half
+                show-score>
+              </el-rate>
+              <span>{{ item.commentCount }}人评分</span>
+            </li>
+          </ul>
+          <nuxt-link class="more-info" :to="{ path: '/productList', query: {type: '按摩/足疗'}}">更多按摩/足疗</nuxt-link></el-tab-pane>
       </el-tabs>
     </div>
     <div class="section-card">
@@ -266,9 +312,15 @@ export default {
   async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
     const { data: { data: newProductList } } = await getNewProduct();
     const { data: { data: newCommentList } } = await getNewComments();
+    const firstList = store.state.product.hotProduct.firstTab;
+    const secondList = store.state.product.hotProduct.secondTab;
+    const thirdList = store.state.product.hotProduct.thirdTab;
     return {
       newProductList,
-      newCommentList
+      newCommentList,
+      firstList,
+      secondList,
+      thirdList
     };
   },
   async mounted() {
@@ -393,12 +445,19 @@ export default {
        padding: 20px;
 
        .pic-list {
-         display: flex;
-         margin: 0;
-         padding: 0;
+        display: flex;
+        margin: 0;
+        padding: 0;
          
+        .pic-shopname {
+          display: block;
+          width: 200px;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
 
-         li {
+        li {
           width: 20%;
           padding: 0 16px;
           font-size: 14px;
@@ -407,6 +466,7 @@ export default {
             width: 100%;
             height: 150px;
             margin-bottom: 10px;
+            border-radius: 4px;
           }
 
           span {
@@ -494,14 +554,15 @@ export default {
         display: flex;
 
         .comment-shopname {
+          width: 110px;
           overflow: hidden;
           white-space: nowrap;
           text-overflow: ellipsis;
-          width: 105px;
+          font-size: 12px;
         }
 
         img {
-          width: 100px;
+          width: 65px;
           height: 60px;
           margin-right: 14px;
           border-radius: 4px;

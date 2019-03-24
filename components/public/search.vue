@@ -1,6 +1,6 @@
 <template>
   <div class="index-search">
-    <img class="index-logo" src="" >
+    <img class="index-logo" src="../../assets/img/groupbuy.png" >
     <div class="search-main">
       <div class="search-form">
         <el-input class="search-input" prefix-icon="el-icon-search" placeholder="搜索商户名、地址等"></el-input>
@@ -32,9 +32,10 @@ export default {
   align-items: center;
 
   .index-logo {
-    width: 165px;
-    height: 60px;
-    margin-right: 300px;
+    width: 250px;
+    height: 100px;
+    margin-left: 50px;
+    margin-right: 100px;
   }
 
   .search-main {

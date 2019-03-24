@@ -246,7 +246,7 @@ router.get('/getProductList', async (ctx) => {
     params.adcode = adcode;
   }
   if (street) {
-    params.street = street;
+    params.place = street;
   }
   if (type) {
     params.type = type;

@@ -89,50 +89,20 @@
       <div class="product-recommand hot-recommand">
         <p>近期热门推荐</p>
         <ul>
-          <li>
-            <a href="#">
-              <img src="../assets/img/img1.jpg" alt="">
-              <p>悦壹生视力矫正中心</p>
+          <li v-for="item in recommand" :key="item._id">
+            <nuxt-link :to="{ path: '/productDetail', query: { id: item._id }}">
+              <img :src="item.imgUrl[0]" :alt="item.name">
+              <p>{{ item.name }}</p>
               <div class="comment">
                 <el-rate
-                  v-model="rate"
+                  v-model="item.averRate"
                   disabled
                   allow-half></el-rate>
-                <span class="count">22个评价</span>
+                <span class="count">{{ item.commentCount }}个评价</span>
               </div>
-              <p class="address">北景园</p>
-              <p class="price">人均￥<span>92</span></p>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <img src="../assets/img/img1.jpg" alt="">
-              <p>悦壹生视力矫正中心</p>
-              <div class="comment">
-                <el-rate
-                  v-model="rate"
-                  disabled
-                  allow-half></el-rate>
-                <span class="count">22个评价</span>
-              </div>
-              <p class="address">北景园</p>
-              <p class="price">人均￥<span>92</span></p>
-            </a>
-          </li>
-          <li>
-            <a href="#">
-              <img src="../assets/img/img1.jpg" alt="">
-              <p>悦壹生视力矫正中心</p>
-              <div class="comment">
-                <el-rate
-                  v-model="rate"
-                  disabled
-                  allow-half></el-rate>
-                <span class="count">22个评价</span>
-              </div>
-              <p class="address">北景园</p>
-              <p class="price">人均￥<span>92</span></p>
-            </a>
+              <p class="address">{{ item.street }}</p>
+              <p class="price">人均￥<span>{{ item.price }}</span></p>
+            </nuxt-link>
           </li>
         </ul>
       </div>
@@ -188,6 +158,10 @@ export default {
   async asyncData({ route, store }) {
     const { data: { data: typeList } } = await queryTypeList();
     const { data: { data: { areaList: placeList } } } = await queryPlaceList(store.state.geo.choosedCity.adcode);
+    const firstList = store.state.product.hotProduct.firstTab.slice(0, 3);
+    const secondList = store.state.product.hotProduct.secondTab.slice(0, 3);
+    const thirdList = store.state.product.hotProduct.thirdTab.slice(0, 3);
+    const recommand = firstList.concat(secondList, thirdList);
     let streetList;
     if (route.query.adcode) {
       const streetIndex = placeList.findIndex((item) => route.query.adcode === item.adcode);
@@ -214,6 +188,7 @@ export default {
         label: 'name',
         value: 'name'
       },
+      recommand
     }
   },
   async mounted() {
