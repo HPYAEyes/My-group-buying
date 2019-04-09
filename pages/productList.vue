@@ -149,7 +149,8 @@ export default {
         totalRecords: 0
       },
       rate: 4.5,
-      listSort: '人气最高'
+      listSort: '人气最高',
+      adcode: this.$route.query.adcode
     };
   },
   components: {
