@@ -40,12 +40,12 @@
                 <i class="iconfont tg-tuan main-color"></i>
               </div>
               <div class="price">
-                <span style="color:#f90">￥<span style="font-size:28px">{{ item.offPrice}}</span></span>
+                <span style="color:#f90">￥<span style="font-size:28px">{{ item.offPrice }}</span></span>
                 <span style="margin-left:16px;color:#999;font-size:12px;">门店价{{ item.salePrice }}</span>
               </div>
             </div>
           </div>
-          <el-button class="buy-btn" type="primary" size="medium">立即抢购</el-button>
+          <el-button class="buy-btn" type="primary" size="medium" @click="buyProduct(item._id)">立即抢购</el-button>
         </li>
       </ul>
     </div>
@@ -143,6 +143,12 @@
         </li>
       </ul>
     </div>
+    <el-dialog
+      :visible.sync="qrCodeDialog"
+      center
+      width="306px">
+      <div ref="qrcode"></div>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -151,6 +157,7 @@ import {
   comment,
   queryCommentList
 } from 'api/product';
+import QRCode from 'qrcodejs2';
 
 export default {
   name: 'productDetail',
@@ -160,6 +167,7 @@ export default {
       commentSort: '按时间降序',
       userRate: 0,
       userComment: '',
+      qrCodeDialog: false,
     };
   },
   async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
@@ -196,6 +204,13 @@ export default {
     }
   },
   methods: {
+    buyProduct(saleId) {
+      this.qrCodeDialog = true;
+      this.$nextTick(() => {
+        this.$refs.qrcode.innerHTML = '';
+        new QRCode(this.$refs.qrcode, `http://localhost:3000/buy?id=${saleId}&productId=${this.$route.query.id}&userId=${this.$store.state.user.userInfo._id}`);  
+      });
+    },
     addComment() {
       if (this.needWords > 0) {
         this.$message.error('请至少输入15个字！');

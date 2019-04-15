@@ -209,18 +209,80 @@ router.get('/getUser', async (ctx) => {
   }
 });
 
-router.post('/getId', async (ctx) => {
-  let user = await User.findOne({
-    _id: ctx.request.body._id
+// 获取用户列表
+router.get('/getUserList', async (ctx) => {
+  const { pageSize, pageNum } = ctx.request.body;
+  const userList = await User.find().skip((pageNum - 1) * pageSize).limit(Number(pageSize)).exec();
+  const totalRecords = await User.countDocuments();
+  if (userList && totalRecords !== undefined) {
+    ctx.body = {
+      code: 'SUC',
+      data: {
+        userList,
+        totalRecords
+      },
+      msg: '获取用户列表成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      data: null,
+      msg: '获取用户列表失败'
+    }
+  }
+});
+
+// 编辑某个用户
+router.post('/editUser', async (ctx) => {
+  const { _id, username, email, password, avatar } = ctx.request.body;
+  if (!_id || !username || !email || !password || ! avatar) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const user = await User.updateOne({ _id }, {
+	username,
+	email,
+	password,
+	avatar
+  });
+  if (user.n) {
+    ctx.body = {
+      code: 'SUC',
+      msg: '编辑用户成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'SERR',
+      msg: '编辑用户失败'
+    }
+  }
+});
+
+// 删除某个用户
+router.delete('/deleteUser', async (ctx) => {
+  const { _id } = ctx.request.body;
+  if (!_id) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const user = await User.deleteOne({
+    _id
   });
   if (user) {
     ctx.body = {
       code: 'SUC',
-      user,
+      msg: '删除用户成功'
     };
   } else {
     ctx.body = {
-      code: 'err'
+      code: 'SERR',
+      msg: '删除用户失败'
     }
   }
 });

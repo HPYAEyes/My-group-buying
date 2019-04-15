@@ -70,6 +70,33 @@ router.get('/getCommentList', async (ctx) => {
   }
 });
 
+// 编辑某个评论
+router.post('/editComment', async (ctx) => {
+  const { _id, rate, content } = ctx.request.body;
+  if (!_id || !rate || !content) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const comment = await Comment.updateOne({ _id }, {
+	rate,
+	content,
+  });
+  if (comment.n) {
+    ctx.body = {
+      code: 'SUC',
+      msg: '编辑评论成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'SERR',
+      msg: '编辑评论失败'
+    }
+  }
+});
+
 // 删除评论
 router.delete('/deleteComment', async (ctx) => {
   const { id } = ctx.request.body;
