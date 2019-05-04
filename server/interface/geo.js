@@ -153,7 +153,12 @@ router.get('/getArea', async (ctx) => {
       subdistrict,
     }
   });
-  const areaList = districts[0].districts.sort((pre, next) => pre.adcode - next.adcode);
+  let areaList;
+  if (!districts[0] || !districts[0].districts) {
+    areaList = districts[0].districts.sort((pre, next) => pre.adcode - next.adcode);
+  } else {
+    areaList = [];
+  }
   if (status === '1') {
     ctx.body = {
       code: 'SUC',
