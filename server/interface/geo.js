@@ -154,7 +154,7 @@ router.get('/getArea', async (ctx) => {
     }
   });
   let areaList;
-  if (!districts[0] || !districts[0].districts) {
+  if (districts[0] && districts[0].districts) {
     areaList = districts[0].districts.sort((pre, next) => pre.adcode - next.adcode);
   } else {
     areaList = [];

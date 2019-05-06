@@ -325,6 +325,7 @@ export default {
   },
   async mounted() {
     const { data: { data: { areaList } } } = await getHotArea(this.cityAdcode, true);
+    console.log(areaList)
     this.setHotArea(areaList);
     document.querySelectorAll('.card-container-main').forEach((item) => {
       item.addEventListener('click', (event) => {
