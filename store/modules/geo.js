@@ -2,7 +2,14 @@ const state = () => ({
   position: '',
   cityList: [],
   hotCity: [],
-  choosedCity: '',
+  choosedCity: {
+    adcode: '330100',
+    center: '120.153576,30.287459',
+    citycode: '0571',
+    name: '杭州市',
+    province: '浙江省',
+    city: '杭州市'
+  },
   hotArea: []
 });
 

@@ -5,7 +5,7 @@
       <div class="user-info">
         <h1>{{ username }}</h1>
         <p class="user-email">{{ email }}</p>
-        <p class="user-createtime">加入本网站已经136天了</p>
+        <p class="user-createtime">于{{ $moment(createdAt).fromNow() }}加入了本网站</p>
       </div>
     </div>
     <ul class="personal-tabs">
@@ -15,6 +15,62 @@
       <li><i class="iconfont tg-yiguoqi">已过期</i></li>
       <li><i class="iconfont tg-gerenxinxi">个人信息设置</i></li>
     </ul>
+    <div class="personal-container">
+      <div class="order-item">
+        <img class="order-img" src="../assets/img/img1.jpg">
+        <div class="order-info">
+          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
+          <span>有效期至：2019-05-31</span>
+        </div>
+        <div class="order-price">总价：¥96.00</div>
+        <div class="order-status">待评价</div>
+      </div>
+      <div class="order-item">
+        <img class="order-img" src="../assets/img/img1.jpg">
+        <div class="order-info">
+          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
+          <span>有效期至：2019-05-31</span>
+        </div>
+        <div class="order-price">总价：¥96.00</div>
+        <div class="order-status">待评价</div>
+      </div>
+      <div class="order-item">
+        <img class="order-img" src="../assets/img/img1.jpg">
+        <div class="order-info">
+          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
+          <span>有效期至：2019-05-31</span>
+        </div>
+        <div class="order-price">总价：¥96.00</div>
+        <div class="order-status">待评价</div>
+      </div>
+      <div class="order-item">
+        <img class="order-img" src="../assets/img/img1.jpg">
+        <div class="order-info">
+          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
+          <span>有效期至：2019-05-31</span>
+        </div>
+        <div class="order-price">总价：¥96.00</div>
+        <div class="order-status">待评价</div>
+      </div>
+      <div class="order-item">
+        <img class="order-img" src="../assets/img/img1.jpg">
+        <div class="order-info">
+          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
+          <span>有效期至：2019-05-31</span>
+        </div>
+        <div class="order-price">总价：¥96.00</div>
+        <div class="order-status">待评价</div>
+      </div>
+      <div class="order-item">
+        <img class="order-img" src="../assets/img/img1.jpg">
+        <div class="order-info">
+          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
+          <span>有效期至：2019-05-31</span>
+        </div>
+        <div class="order-price">总价：¥96.00</div>
+        <div class="order-status">待评价</div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -28,6 +84,7 @@ export default {
       username: store.state.user.userInfo.username,
       avatar: store.state.user.userInfo.avatar,
       email: store.state.user.userInfo.email,
+      createdAt: store.state.user.userInfo.createdAt
     };
   },
 }
@@ -81,7 +138,7 @@ export default {
   .personal-tabs {
     width: 100%;
     height: 110px;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -96,6 +153,7 @@ export default {
     }
 
     i {
+      cursor: pointer;
       &:before {
         position: absolute;
         top: 50%;
@@ -132,6 +190,56 @@ export default {
       &:before {
         color: #67c23a;        
       }
+    }
+  }
+
+  .personal-container {
+    width: 100%;
+    margin-bottom: 30px;
+    padding: 0 16px;
+    border: 1px solid $border;
+    border-radius: 4px;
+    background-color: #fff;
+    color: $greyFont;
+    font-size: 12px;
+    box-sizing: border-box;
+
+    .order-item {
+      display: flex;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid #e5e5e5;
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    .order-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 4px;
+    }
+
+    .order-info {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 2;
+      margin-left: 20px;
+
+      p {
+        margin-bottom: 12px;
+        font-size: 16px;
+        color: $mainFont;
+      }
+    }
+
+    .order-price {
+      flex-grow: 1;
+    }
+
+    .order-status {
+      flex-grow: 1;
     }
   }
 }

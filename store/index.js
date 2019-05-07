@@ -16,7 +16,7 @@ const store = () => new Vuex.Store({
     async nuxtServerInit({ commit }, { req, app }) {
       const { data } = await app.$axios.get('/users/getUser');
       if (data.code === 'SUC') {
-        commit('user/setUserInfo', { username: data.username, _id: data._id, email: data.email, avatar: data.avatar });
+        commit('user/setUserInfo', { username: data.username, _id: data._id, email: data.email, avatar: data.avatar, createdAt: data.createdAt });
       } else {
         commit('user/setUserInfo', {});
       }
