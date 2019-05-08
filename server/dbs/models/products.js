@@ -82,6 +82,10 @@ const ProductSchema = new Schema({
         type: Number,
         required: true
       },
+      expires: {
+        type: String,
+        required: true
+      }
     }
   ],
   lng: {

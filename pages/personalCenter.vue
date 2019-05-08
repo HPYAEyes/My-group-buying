@@ -9,84 +9,96 @@
       </div>
     </div>
     <ul class="personal-tabs">
-      <li><i class="iconfont tg-all-order">全部订单</i></li>
-      <li><i class="iconfont tg-daishiyong">待使用</i></li>
-      <li><i class="iconfont tg-daipingjia">待评价</i></li>
-      <li><i class="iconfont tg-yiguoqi">已过期</i></li>
-      <li><i class="iconfont tg-gerenxinxi">个人信息设置</i></li>
+      <li @click="status = ''"><i class="iconfont tg-all-order">全部订单</i></li>
+      <li @click="status = '1'"><i class="iconfont tg-daishiyong">待使用</i></li>
+      <li @click="status = '2'"><i class="iconfont tg-daipingjia">待评价</i></li>
+      <li @click="status = '3'"><i class="iconfont tg-yiguoqi">已过期</i></li>
+      <li @click="status = '-1'"><i class="iconfont tg-gerenxinxi">个人信息设置</i></li>
     </ul>
     <div class="personal-container">
-      <div class="order-item">
-        <img class="order-img" src="../assets/img/img1.jpg">
-        <div class="order-info">
-          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
-          <span>有效期至：2019-05-31</span>
-        </div>
-        <div class="order-price">总价：¥96.00</div>
-        <div class="order-status">待评价</div>
-      </div>
-      <div class="order-item">
-        <img class="order-img" src="../assets/img/img1.jpg">
-        <div class="order-info">
-          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
-          <span>有效期至：2019-05-31</span>
-        </div>
-        <div class="order-price">总价：¥96.00</div>
-        <div class="order-status">待评价</div>
-      </div>
-      <div class="order-item">
-        <img class="order-img" src="../assets/img/img1.jpg">
-        <div class="order-info">
-          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
-          <span>有效期至：2019-05-31</span>
-        </div>
-        <div class="order-price">总价：¥96.00</div>
-        <div class="order-status">待评价</div>
-      </div>
-      <div class="order-item">
-        <img class="order-img" src="../assets/img/img1.jpg">
-        <div class="order-info">
-          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
-          <span>有效期至：2019-05-31</span>
-        </div>
-        <div class="order-price">总价：¥96.00</div>
-        <div class="order-status">待评价</div>
-      </div>
-      <div class="order-item">
-        <img class="order-img" src="../assets/img/img1.jpg">
-        <div class="order-info">
-          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
-          <span>有效期至：2019-05-31</span>
-        </div>
-        <div class="order-price">总价：¥96.00</div>
-        <div class="order-status">待评价</div>
-      </div>
-      <div class="order-item">
-        <img class="order-img" src="../assets/img/img1.jpg">
-        <div class="order-info">
-          <p>音浪KTV(中大银泰店)-黄金档欢唱套餐</p>
-          <span>有效期至：2019-05-31</span>
-        </div>
-        <div class="order-price">总价：¥96.00</div>
-        <div class="order-status">待评价</div>
-      </div>
+      <h2>{{ title }}</h2>
+      <el-collapse>
+        <el-collapse-item v-for="item in orderList" :key="item._id">
+          <template slot="title">
+            <div class="order-item">
+              <img class="order-img" :src="item.imgUrl[0]">
+              <div class="order-info">
+                <p>{{ item.saleName }}</p>
+                <span>订单编号：{{ item._id }}</span>
+                <span>有效期至：{{ item.expires }}</span>
+              </div>
+              <div class="order-price">总价：¥{{ item.price }}</div>
+              <div class="order-status">
+                <span v-if="item.status === '0'">已评价</span>
+                <span v-else-if="item.status === '1'">待使用</span>
+                <span v-else-if="item.status === '2'">待评价</span>
+                <span v-else-if="item.status === '3'">已使用</span>
+              </div>
+            </div>
+          </template>
+          <div class="order-detail">
+            <p>店名：{{ item.productName }}</p>
+            <p>地址：{{ item.address }}</p>
+            <p>类型：{{ item.type }}</p>
+            <p>门店价：{{ item.salePrice }}</p>
+          </div>
+        </el-collapse-item>
+      </el-collapse>
     </div>
   </div>
 </template>
 <script>
+import { getUserOrderList } from 'api/personal';
+
 export default {
   name: 'personalCenter',
   data() {
-    return {};
+    return {
+      orderList: [],
+      status: '',
+    };
   },
   asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
     return {
       username: store.state.user.userInfo.username,
       avatar: store.state.user.userInfo.avatar,
       email: store.state.user.userInfo.email,
-      createdAt: store.state.user.userInfo.createdAt
+      createdAt: store.state.user.userInfo.createdAt,
     };
   },
+  mounted() {
+    this.getOrderList();
+  },
+  computed: {
+    title() {
+      if (this.status === '') {
+        return '全部订单';
+      }
+      const titleObj = {
+        '1': '待使用',
+        '2': '待评价',
+        '3': '已过期',
+        '-1': '个人信息设置'
+      };
+      return titleObj[this.status];
+    }
+  },
+  watch: {
+    status(newVal, oldVal) {
+      if (newVal === oldVal) return;
+      newVal === '-1' ? '': this.getOrderList(newVal);
+    }
+  },
+  methods: {
+    getOrderList(status) {
+      getUserOrderList({
+        userId: this.$store.state.user.userInfo._id,
+        status
+      }).then((res) => {
+        this.orderList = res.data.data;
+      })
+    }
+  }
 }
 </script>
 <style lang="scss">
@@ -204,15 +216,33 @@ export default {
     font-size: 12px;
     box-sizing: border-box;
 
+    h2 {
+      padding: 16px 0;
+    }
+
+    .el-collapse,
+    .el-collapse-item__wrap {
+      border: 0;
+    }
+
+    .el-collapse-item__header {
+      height: auto;
+      line-height: inherit;
+      color: inherit;
+      font-size: inherit;
+      border: 0;
+    }
+
     .order-item {
       display: flex;
       align-items: center;
+      width: 100%;
       padding: 16px 0;
-      border-bottom: 1px solid #e5e5e5;
+      border-top: 1px solid #e5e5e5;
+    }
 
-      &:last-child {
-        border-bottom: 0;
-      }
+    .order-detail {
+      border-top: 1px solid #e5e5e5;
     }
 
     .order-img {
@@ -224,22 +254,26 @@ export default {
     .order-info {
       display: flex;
       flex-direction: column;
-      flex-grow: 2;
+      flex-grow: 1;
       margin-left: 20px;
 
       p {
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         font-size: 16px;
         color: $mainFont;
+      }
+
+      span {
+        margin-bottom: 4px;
       }
     }
 
     .order-price {
-      flex-grow: 1;
+      flex-basis: 200px;
     }
 
     .order-status {
-      flex-grow: 1;
+      flex-basis: 200px;
     }
   }
 }

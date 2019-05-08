@@ -45,7 +45,7 @@
               </div>
             </div>
           </div>
-          <el-button class="buy-btn" type="primary" size="medium" @click="buyProduct(item._id)">立即抢购</el-button>
+          <el-button class="buy-btn" type="primary" size="medium" @click="openPayDialog(item._id)">立即抢购</el-button>
         </li>
       </ul>
     </div>
@@ -144,10 +144,15 @@
       </ul>
     </div>
     <el-dialog
+      title="扫码支付"
       :visible.sync="qrCodeDialog"
       center
       width="306px">
       <div ref="qrcode"></div>
+      <div style="margin-top: 20px;display:flex;justify-content: space-between;">
+        <el-button @click="qrCodeDialog = false">取消</el-button>
+        <el-button type="primary" @click="buyProduct">确认支付</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -155,7 +160,8 @@
 import {
   queryProduct,
   comment,
-  queryCommentList
+  queryCommentList,
+  placeOrder
 } from 'api/product';
 import QRCode from 'qrcodejs2';
 
@@ -168,6 +174,7 @@ export default {
       userRate: 0,
       userComment: '',
       qrCodeDialog: false,
+      saleId: ''
     };
   },
   async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
@@ -204,11 +211,21 @@ export default {
     }
   },
   methods: {
-    buyProduct(saleId) {
+    openPayDialog(saleId) {
       this.qrCodeDialog = true;
+      this.saleId = saleId;
       this.$nextTick(() => {
         this.$refs.qrcode.innerHTML = '';
         new QRCode(this.$refs.qrcode, `http://localhost:3000/buy?id=${saleId}&productId=${this.$route.query.id}&userId=${this.$store.state.user.userInfo._id}`);  
+      });
+    },
+    buyProduct() {
+      placeOrder({
+        saleId: this.saleId,
+        productId: this.$route.query.id,
+        userId: this.$store.state.user.userInfo._id
+      }).then((res) => {
+        this.$message.success(res.data.msg);
       });
     },
     addComment() {

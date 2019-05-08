@@ -51,3 +51,11 @@ export function comment({
 export function queryCommentList(productId, pageNum = 1, pageSize = 10, sort) {
   return request.get(`/comment/getCommentList?pageNum=${pageNum}&pageSize=${pageSize}&productId=${productId}&sort=${sort}`);
 }
+
+export function placeOrder({
+  saleId,
+  productId,
+  userId,
+}) {
+  return request.get(`/order/placeOrder?saleId=${saleId}&productId=${productId}&userId=${userId}`);
+}

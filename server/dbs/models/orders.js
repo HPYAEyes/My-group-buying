@@ -15,7 +15,39 @@ const OrderSchema = new Schema({
     type: mongoose.ObjectId,
     required: true,
   },
-  status: {
+  saleName: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true
+  },
+  salePrice: {
+    type: Number,
+    required: true
+  },
+  expires: {
+    type: String,
+    required: true
+  },
+  imgUrl: {
+    type: Array,
+    required: true
+  },
+  productName: {
+    type: String,
+    required: true
+  },
+  address: {
+    type: String,
+    required: true
+  },
+  type: {
+    type: String,
+    required: true
+  },
+  status: { // 0为已评价，1为待使用，2为待评价，3为已过期
     type: String,
     required: true
   }

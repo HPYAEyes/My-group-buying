@@ -10,6 +10,7 @@ import geo from './interface/geo';
 import product from './interface/product';
 import admin from './interface/adminusers';
 import comment from './interface/comment';
+import order from './interface/orders';
 import { scheduleCronstyle } from './schedule';
 
 const Koa = require('koa')
@@ -61,6 +62,7 @@ async function start() {
   app.use(product.routes()).use(product.allowedMethods())
   app.use(admin.routes()).use(admin.allowedMethods())
   app.use(comment.routes()).use(comment.allowedMethods())
+  app.use(order.routes()).use(order.allowedMethods())
 
   app.use(ctx => {
     ctx.status = 200 // koa defaults to 404 when it sees that status is unset
