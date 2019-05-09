@@ -17,33 +17,56 @@
     </ul>
     <div class="personal-container">
       <h2>{{ title }}</h2>
-      <el-collapse>
-        <el-collapse-item v-for="item in orderList" :key="item._id">
-          <template slot="title">
-            <div class="order-item">
-              <img class="order-img" :src="item.imgUrl[0]">
-              <div class="order-info">
-                <p>{{ item.saleName }}</p>
-                <span>订单编号：{{ item._id }}</span>
-                <span>有效期至：{{ item.expires }}</span>
+      <template v-if="status !== '-1'">
+        <el-collapse>
+          <el-collapse-item v-for="item in orderList" :key="item._id">
+            <template slot="title">
+              <div class="order-item">
+                <img class="order-img" :src="item.imgUrl[0]">
+                <div class="order-info">
+                  <p>{{ item.saleName }}</p>
+                  <span>订单编号：{{ item._id }}</span>
+                  <span>有效期至：{{ item.expires }}</span>
+                </div>
+                <div class="order-price">总价：¥{{ item.price }}</div>
+                <div class="order-status">
+                  <span v-if="item.status === '0'">已评价</span>
+                  <span v-else-if="item.status === '1'">待使用</span>
+                  <span v-else-if="item.status === '2'">待评价</span>
+                  <span v-else-if="item.status === '3'">已使用</span>
+                </div>
               </div>
-              <div class="order-price">总价：¥{{ item.price }}</div>
-              <div class="order-status">
-                <span v-if="item.status === '0'">已评价</span>
-                <span v-else-if="item.status === '1'">待使用</span>
-                <span v-else-if="item.status === '2'">待评价</span>
-                <span v-else-if="item.status === '3'">已使用</span>
-              </div>
+            </template>
+            <div class="order-detail">
+              <p>店名：{{ item.productName }}</p>
+              <p>地址：{{ item.address }}</p>
+              <p>类型：{{ item.type }}</p>
+              <p>门店价：{{ item.salePrice }}</p>
+              <p>下单时间：{{ $moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss') }}</p>
             </div>
-          </template>
-          <div class="order-detail">
-            <p>店名：{{ item.productName }}</p>
-            <p>地址：{{ item.address }}</p>
-            <p>类型：{{ item.type }}</p>
-            <p>门店价：{{ item.salePrice }}</p>
-          </div>
-        </el-collapse-item>
-      </el-collapse>
+          </el-collapse-item>
+        </el-collapse>
+      </template>
+      <template v-else>
+        <div class="personal-info">
+          <div class="info-label">头像</div>
+          <img :src="avatar" alt="用户头像">
+          <el-button class="modify-btn" round>修改</el-button>
+        </div>
+        <div class="personal-info">
+          <div class="info-label">昵称</div>
+          <p>{{ username }}</p>
+          <el-button class="modify-btn" round>修改</el-button>
+        </div>
+        <div class="personal-info">
+          <div class="info-label">邮箱</div>
+          <p>{{ email }}</p>
+        </div>
+        <div class="personal-info">
+          <div class="info-label">密码</div>
+          <el-button class="modify-btn" round>修改</el-button>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -220,6 +243,42 @@ export default {
       padding: 16px 0;
     }
 
+    .personal-info {
+      display: flex;
+      align-items: center;
+      height: 120px;
+      border-top: 1px solid #e5e5e5;
+      font-size: 18px;
+      color: $mainFont;
+
+      .info-label {
+        flex-basis: 100px;
+        height: 40px;
+        line-height: 40px;
+        padding-right: 30px;
+        border-right: 1px solid #e5e5e5;
+        text-align: right;
+      }
+
+      img {
+        width: 48px;
+        height: 48px;
+        margin-left: 30px;
+        border-radius: 50%;
+      }
+
+      p {
+        margin-left: 30px;
+        color: $greyFont;
+        font-size: 14px;
+      }
+
+      .modify-btn {
+        margin-left: auto;
+        margin-right: 30px;
+      }
+    }
+
     .el-collapse,
     .el-collapse-item__wrap {
       border: 0;
@@ -233,6 +292,12 @@ export default {
       border: 0;
     }
 
+    .el-collapse-item__content {
+      padding: 16px;
+      border-top: 1px solid #e5e5e5;
+      color: inherit;
+    }
+
     .order-item {
       display: flex;
       align-items: center;
@@ -242,7 +307,7 @@ export default {
     }
 
     .order-detail {
-      border-top: 1px solid #e5e5e5;
+      // border-top: 1px solid #e5e5e5;
     }
 
     .order-img {

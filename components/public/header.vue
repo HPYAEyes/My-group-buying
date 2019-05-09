@@ -28,8 +28,7 @@
       <template v-else>
         <el-button type="text">欢迎您，{{ username }}</el-button>
         <el-button type="text" @click="handleLogout">登出</el-button>
-        <el-button type="text">个人中心</el-button>
-        <el-button type="text">我的订单</el-button>
+        <el-button type="text" @click="$router.push({ path: '/personalCenter' })">个人中心</el-button>
       </template>
     </div>
     <el-dialog
