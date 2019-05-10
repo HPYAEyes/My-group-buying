@@ -11,3 +11,27 @@ export function getUserOrderList({
   }
   return request.get(`/order/getOrderList?userId=${userId}${params}`);
 }
+
+export function updatePersonalInfo({
+  _id,
+  username,
+  avatar
+}) {
+  return request.post('/users/updateInfo', {
+    _id,
+    username,
+    avatar
+  });
+}
+
+export function updateUserPwd({
+  _id,
+  oldPwd,
+  newPwd
+}) {
+  return request.post('/users/modifyPwd', {
+    _id,
+    oldPwd,
+    newPwd
+  });
+}

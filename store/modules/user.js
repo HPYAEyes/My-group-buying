@@ -10,7 +10,7 @@ const mutations = {
 
 const actions = {
   setUserInfo({ commit }, userInfo) {
-    commit('setUserInfo', useruserInfoname);
+    commit('setUserInfo', userInfo);
   },
 };
 

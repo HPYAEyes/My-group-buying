@@ -245,10 +245,10 @@ router.post('/editUser', async (ctx) => {
     return false;
   }
   const user = await User.updateOne({ _id }, {
-	username,
-	email,
-	password,
-	avatar
+    username,
+    email,
+    password,
+    avatar
   });
   if (user.n) {
     ctx.body = {
@@ -260,6 +260,76 @@ router.post('/editUser', async (ctx) => {
       code: 'SERR',
       msg: '编辑用户失败'
     }
+  }
+});
+
+// 用户编辑个人资料
+router.post('/updateInfo', async (ctx) => {
+  const { _id, username, avatar } = ctx.request.body;
+  if (!_id) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const params = {};
+  if (username) {
+    params.username = username;
+  }
+  if (avatar) {
+    params.avatar = avatar;
+  }
+  const user = await User.updateOne({ _id }, params);
+  if (user.n) {
+    ctx.body = {
+      code: 'SUC',
+      msg: '编辑个人资料成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'SERR',
+      msg: '编辑个人资料失败'
+    }
+  }
+});
+
+// 用户修改密码
+router.post('/modifyPwd', async (ctx) => {
+  const { _id, oldPwd, newPwd } = ctx.request.body;
+  if (!_id || !oldPwd || !newPwd) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const oldInfo = await User.findOne({ _id }, { password: oldPwd });
+  if (!oldInfo) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '用户信息有误'
+    };
+    return false;
+  }
+  if (oldPwd !== oldInfo.password) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '旧密码错误'
+    };
+    return false;
+  }
+  const user = await User.updateOne({ _id }, { password: newPwd });
+  if (user.n) {
+    ctx.body = {
+      code: 'SUC',
+      msg: '修改密码成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'SERR',
+      msg: '修改密码失败'
+    };
   }
 });
 

@@ -16,6 +16,7 @@ router.get('/placeOrder', async (ctx) => {
     };
     return false;
   }
+  console.log(ctx.query)
   const productInfo = await Product.findOne({ _id: productId });
   if (!productInfo) {
     ctx.body = {

@@ -51,7 +51,19 @@
         <div class="personal-info">
           <div class="info-label">头像</div>
           <img :src="avatar" alt="用户头像">
-          <el-button class="modify-btn" round>修改</el-button>
+          <el-upload
+            class="modify-upload"
+            ref="upload"
+            action="http://localhost:3333/uploadFiles"
+            :before-upload="handleBeforeUpload"
+            :on-success="handleSuccess"
+            :on-error="handleRemove"
+            :limit="1"
+            accept="image/jpeg,image/png"
+            :show-file-list="false"
+            >
+            <el-button class="modify-btn" round @click="$refs.upload.clearFiles()">修改</el-button>
+          </el-upload>
         </div>
         <div class="personal-info">
           <div class="info-label">昵称</div>
@@ -64,21 +76,87 @@
         </div>
         <div class="personal-info">
           <div class="info-label">密码</div>
-          <el-button class="modify-btn" round>修改</el-button>
+          <el-button class="modify-btn" round @click="modifyPwdDialog = true">修改</el-button>
+          <el-dialog
+            title="修改密码"
+            :visible.sync="modifyPwdDialog"
+            center
+            width="20%"
+            @closed="$refs.modifyPwdForm.resetFields()">
+            <el-form
+            :model="modifyPwdForm"
+            :rules="modifyPwdRules"
+            ref="modifyPwdForm"
+            label-width="80px">
+              <el-form-item label="旧密码" prop="oldPwd">
+                <el-input type="password" :maxlength="16" :minlength="6" v-model="modifyPwdForm.oldPwd"></el-input>
+              </el-form-item>
+              <el-form-item label="新密码" prop="newPwd">
+                <el-input type="password" :maxlength="16" :minlength="6" v-model="modifyPwdForm.newPwd"></el-input>
+              </el-form-item>
+              <el-form-item label="重复密码" prop="repeatPwd">
+                <el-input type="password" :maxlength="16" :minlength="6" v-model="modifyPwdForm.repeatPwd"></el-input>
+              </el-form-item>
+            </el-form>
+            <div slot="footer">
+              <el-button @click="modifyPwdDialog = false">取消</el-button>
+              <el-button type="primary" @click="modifyPwd('modifyPwdForm')">确定</el-button>
+            </div>
+          </el-dialog>
         </div>
       </template>
     </div>
   </div>
 </template>
 <script>
-import { getUserOrderList } from 'api/personal';
+import {
+  getUserOrderList,
+  updatePersonalInfo,
+  updateUserPwd
+} from 'api/personal';
+import { createNamespacedHelpers  } from 'vuex';
+
+const { mapActions } = createNamespacedHelpers('user');
 
 export default {
   name: 'personalCenter',
   data() {
+    const validateNewPwd = (rule, value, callback) => {
+      if (value === this.modifyPwdForm.oldPwd ) {
+        callback(new Error('新密码不能与旧密码相同'))
+      } else {
+        callback()
+      }
+    }
+    const validateRepeatPwd = (rule, value, callback) => {
+      if (value !== this.modifyPwdForm.repeatPwd ) {
+        callback(new Error('两次输入的密码不一致'))
+      } else {
+        callback()
+      }
+    }
     return {
       orderList: [],
       status: '',
+      modifyPwdDialog: false,
+      modifyPwdForm: {
+        oldPwd: '',
+        newPwd: '',
+        repeatPwd: ''
+      },
+      modifyPwdRules:{
+        oldPwd: [
+          { required: true, message: '请输入旧密码', trigger: 'blur' },
+        ],
+        newPwd: [
+          { required: true, message: '请输入新密码', trigger: 'blur' },
+          { required: true, trigger: 'blur', validator: validateNewPwd }
+        ],
+        repeatPwd: [
+          { required: true, message: '请重复输入密码', trigger: 'blur' },
+          { required: true, trigger: 'blur', validator: validateRepeatPwd }
+        ],
+      }
     };
   },
   asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
@@ -110,9 +188,56 @@ export default {
     status(newVal, oldVal) {
       if (newVal === oldVal) return;
       newVal === '-1' ? '': this.getOrderList(newVal);
-    }
+    },
   },
   methods: {
+    ...mapActions([
+      'setUserInfo'
+    ]),
+    modifyPwd(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const { _id } = this.$store.state.user.userInfo;
+          const { oldPwd, newPwd } = this.modifyPwdForm;
+          updateUserPwd({ _id, oldPwd, newPwd }).then((res) => {
+            this.$message.success(res.data.msg);
+            this.modifyPwdDialog = false;
+          });
+        } else {
+          console.warn('error submit');
+          return false;
+        }
+      });
+    },
+    handleBeforeUpload(file) {
+      const reg = /(jpe?g)|png/
+      const isLt2M = file.size / 1024 / 1024 < 2;
+      const isJpgOrPng = reg.test(file.type)
+      console.log(isJpgOrPng)
+
+      if (!isJpgOrPng) {
+        this.$message.error('上传头像图片只能是png或jpg格式!');
+        return false;
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过2MB!');
+        return false;
+      }
+      return isJpgOrPng && isLt2M;
+    },
+    handleSuccess(res) {
+      const avatar = res.data[0];
+      const newUserInfo = { ...this.$store.state.user.userInfo, avatar };
+      this.setUserInfo(newUserInfo);
+      const { _id } = this.$store.state.user.userInfo;
+      updatePersonalInfo({ _id, avatar }).then((resp) => {
+        this.avatar = avatar;
+        this.$message.success(res.msg);
+      });
+    },
+    handleRemove(err) {
+      this.$message.error(err);
+    },
     getOrderList(status) {
       getUserOrderList({
         userId: this.$store.state.user.userInfo._id,
@@ -271,6 +396,10 @@ export default {
         margin-left: 30px;
         color: $greyFont;
         font-size: 14px;
+      }
+
+      .modify-upload {
+        margin-left: auto;
       }
 
       .modify-btn {

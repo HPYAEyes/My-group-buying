@@ -151,7 +151,7 @@
       <div ref="qrcode"></div>
       <div style="margin-top: 20px;display:flex;justify-content: space-between;">
         <el-button @click="qrCodeDialog = false">取消</el-button>
-        <el-button type="primary" @click="buyProduct">确认支付</el-button>
+        <!-- <el-button type="primary" @click="buyProduct">确认支付</el-button> -->
       </div>
     </el-dialog>
   </div>
@@ -216,7 +216,7 @@ export default {
       this.saleId = saleId;
       this.$nextTick(() => {
         this.$refs.qrcode.innerHTML = '';
-        new QRCode(this.$refs.qrcode, `http://localhost:3000/buy?id=${saleId}&productId=${this.$route.query.id}&userId=${this.$store.state.user.userInfo._id}`);  
+        new QRCode(this.$refs.qrcode, `http://mygroupbuy.natapp1.cc/order/placeOrder?saleId=${saleId}&productId=${this.$route.query.id}&userId=${this.$store.state.user.userInfo._id}`);  
       });
     },
     buyProduct() {

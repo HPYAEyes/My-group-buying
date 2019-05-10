@@ -205,8 +205,13 @@ export default {
     };
   },
   async mounted() {
-    this.choosedCity = JSON.parse(window.localStorage.getItem('districts'));
-    this.setChoosedCity(this.choosedCity);
+    const choosedCity = JSON.parse(window.localStorage.getItem('districts'));
+    if (choosedCity) {
+      this.choosedCity = JSON.parse(window.localStorage.getItem('districts'));
+      this.setChoosedCity(this.choosedCity);
+    } else {
+      this.choosedCity = this.$store.state.geo.choosedCity;
+    }
     this.username = this.$store.state.user.userInfo.username ? this.$store.state.user.userInfo.username : '';
   },
   computed: {
