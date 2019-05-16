@@ -13,6 +13,7 @@
       <li @click="status = '1'"><i class="iconfont tg-daishiyong">待使用</i></li>
       <li @click="status = '2'"><i class="iconfont tg-daipingjia">待评价</i></li>
       <li @click="status = '3'"><i class="iconfont tg-yiguoqi">已过期</i></li>
+      <li @click="status = '3'"><i class="iconfont tg-yiguoqi">已退单</i></li>
       <li @click="status = '-1'"><i class="iconfont tg-gerenxinxi">个人信息设置</i></li>
     </ul>
     <div class="personal-container">
@@ -37,6 +38,10 @@
                   <span v-else-if="item.status === '2'">待评价</span>
                   <span v-else-if="item.status === '3'">已过期</span>
                 </div>
+                <div class="order-operate">
+                  <el-button v-if="item.status === '1'" size="mini" round @click="openUseDialog(item._id)">去使用</el-button>
+                  <el-button v-if="item.status === '2'" size="mini" round @click="gotoComment(item)">去评价</el-button>
+                </div>
               </div>
             </template>
             <div class="order-detail">
@@ -48,6 +53,16 @@
             </div>
           </el-collapse-item>
         </el-collapse>
+        <el-dialog
+          title="使用团购优惠券"
+          :visible.sync="qrCodeDialog"
+          center
+          width="306px">
+          <div ref="userCode"></div>
+          <div style="margin-top: 20px;display:flex;justify-content: space-between;">
+            <el-button @click="qrCodeDialog = false">取消</el-button>
+          </div>
+        </el-dialog>
       </template>
       <template v-else>
         <div class="personal-info">
@@ -145,6 +160,7 @@ export default {
     return {
       orderList: [],
       status: '',
+      qrCodeDialog: false,
       modifyPwdDialog: false,
       modifyPwdForm: {
         oldPwd: '',
@@ -174,7 +190,11 @@ export default {
       createdAt: store.state.user.userInfo.createdAt,
     };
   },
-  mounted() {
+  async mounted() {
+    // 服务端没有document对象，需要在客户端环境加载
+    if (!this.$isServer) {
+      this.QRCode = await import('qrcodejs2');
+    }
     this.getOrderList();
   },
   computed: {
@@ -201,6 +221,22 @@ export default {
     ...mapActions([
       'setUserInfo'
     ]),
+    gotoComment({ _id, productId, saleName}) {
+      this.$router.push({ path: '/productDetail', query: {
+        id: productId,
+        orderId: _id,
+        saleName: encodeURIComponent(saleName)
+      }});
+    },
+    openUseDialog(orderId) {
+      if (!this.QRCode) return false;
+      const QRCode = this.QRCode.default;
+      this.qrCodeDialog = true;
+      this.$nextTick(() => {
+        this.$refs.userCode.innerHTML = '';
+        new QRCode(this.$refs.userCode, `http://mygroupbuy.natapp1.cc/order/orderUse?orderId=${orderId}`);  
+      });
+    },
     modifyPwd(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -469,12 +505,10 @@ export default {
       }
     }
 
-    .order-price {
-      flex-basis: 200px;
-    }
-
-    .order-status {
-      flex-basis: 200px;
+    .order-price,
+    .order-status,
+    .order-operate{
+      flex-basis: 120px;
     }
   }
 }

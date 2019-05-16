@@ -176,13 +176,17 @@
       <ul class="newest-comment-list">
         <li v-for="item in newCommentList" :key="item._id">
           <div class="comment-header">
-            <img :src="item.productId.imgUrl[0]" alt="用户头像">
+            <nuxt-link :to="{ path: '/productDetail', query: { id: item.productId._id }}">
+              <img :src="item.productId.imgUrl[0]" alt="用户头像">
+            </nuxt-link>
             <div>
               <el-tooltip 
                 effect="dark"
                 :content="item.productId.name"
                 placement="top">
-                <p class="comment-shopname">{{item.productId.name}}</p>
+                <nuxt-link :to="{ path: '/productDetail', query: { id: item.productId._id }}">
+                  <p class="comment-shopname">{{item.productId.name}}</p>
+                </nuxt-link>
               </el-tooltip>
               <el-tag size="medium" style="position: absolute;bottom:0;">{{ item.productId.type }}</el-tag>
             </div>

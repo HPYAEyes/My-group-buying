@@ -1,4 +1,5 @@
 import Comment from '../dbs/models/comments';
+import Order from '../dbs/models/orders';
 import Router from 'koa-router';
 
 let router = new Router({
@@ -7,8 +8,8 @@ let router = new Router({
 
 // 新增评论
 router.post('/addComment', async (ctx) => {
-  const { userId, productId, content, rate } = ctx.request.body;
-  if (!userId || !productId || !content || !rate) {
+  const { userId, productId, orderId, content, rate } = ctx.request.body;
+  if (!userId || !productId || !orderId || !content || !rate) {
     ctx.body = {
       code: 'CERR',
       msg: '参数有误'
@@ -18,10 +19,21 @@ router.post('/addComment', async (ctx) => {
   const comment = await Comment.create({
     userId,
     productId,
+    orderId,
     rate,
     content,
   });
-  if (comment) {
+  if (!comment) {
+    ctx.body = {
+      code: 'SERR',
+      msg: '评论失败'
+    };
+    return false;
+  }
+  const isUpdated = await Order.updateOne({ _id: orderId }, {
+    status: '0'
+  });
+  if (isUpdated) {
     ctx.body = {
       code: 'SUC',
       msg: '评论成功'
@@ -30,7 +42,7 @@ router.post('/addComment', async (ctx) => {
     ctx.body = {
       code: 'SERR',
       msg: '评论失败'
-    }
+    };
   }
 });
 
@@ -50,7 +62,13 @@ router.get('/getCommentList', async (ctx) => {
     '按评分降序': { rate: 'desc'},
     '按评分升序': { rate: 'asc'},
   };
-  const comment = await Comment.find({ productId }).populate('userId', 'username avatar').skip((pageNum - 1) * pageSize).limit(Number(pageSize)).sort(filterBy[sort]).exec();
+  const comment = await Comment.find({ productId })
+    .populate('userId', 'username avatar')
+    .populate('orderId', 'saleName status')
+    .skip((pageNum - 1) * pageSize)
+    .limit(Number(pageSize))
+    .sort(filterBy[sort])
+    .exec();
   const totalRecords = await Comment.countDocuments({ productId });
   if (comment && totalRecords !== undefined) {
     ctx.body = {

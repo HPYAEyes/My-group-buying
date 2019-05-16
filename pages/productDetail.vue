@@ -66,7 +66,7 @@
           <img :src="item.userId.avatar">
           <div class="info-detail">
             <span>{{ item.userId.username }}</span>
-            <span style="margin: 4px 0;font-size:14px;color:#666">眼包温灸</span>
+            <span style="margin: 4px 0;font-size:14px;color:#666">{{ item.orderId.saleName }}</span>
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <el-rate
                 v-model="item.rate"
@@ -92,13 +92,13 @@
         </el-pagination>
       </li>
     </ul>
-    <div class="login-user-comment" v-if="$store.state.user.userInfo.username">
-      <div>去过悦壹生视力矫正中心？给大家分享体验！</div>
+    <div class="login-user-comment" v-if="$store.state.user.userInfo.username && orderId && saleName && orderStatus === '2'">
+      <div>去过{{ productInfo.name }}？给大家分享体验！</div>
       <div class="user-info">
         <img :src="$store.state.user.userInfo.avatar" alt="头像">
         <div class="info-detail">
           <span>{{ $store.state.user.userInfo.username }}</span>
-          <span style="margin: 4px 0;font-size:14px;color:#666">眼包温灸</span>
+          <span style="margin: 4px 0;font-size:14px;color:#666">{{ saleName }}</span>
           <div style="display:flex;justify-content:space-between;align-items:center;">
             <el-rate
               v-model="userRate"
@@ -110,13 +110,14 @@
       </div>
       <div class="user-comment">
         <el-input
-        v-model.trim="userComment"
-        type="textarea"
-        :autosize="{ minRows: 3, maxRows: 6}"
-        minlength="15"
-        maxlength="200"
-        placeholder="请输入内容"
-        resize="none"></el-input>
+          v-model.trim="userComment"
+          type="textarea"
+          :autosize="{ minRows: 3, maxRows: 6}"
+          minlength="15"
+          maxlength="200"
+          placeholder="请输入内容"
+          resize="none">
+        </el-input>
         <p v-if="needWords > 0" style="margin: 8px 0;color:#999;font-size:12px">至少需要写15个字哦，还需<span style="color:#409EFF">{{ needWords }}</span>个字</p>
         <p v-else style="margin: 8px 0;color:#999;font-size:12px">您还可以输入<span style="color:#409EFF">{{ applyWords }}</span>个字</p>
         <el-button type="primary" size="medium" @click="addComment">评论</el-button>
@@ -161,7 +162,8 @@ import {
   queryProduct,
   comment,
   queryCommentList,
-  placeOrder
+  placeOrder,
+  getOrderInfo
 } from 'api/product';
 // import QRCode from 'qrcodejs2';
 
@@ -174,7 +176,10 @@ export default {
       userRate: 0,
       userComment: '',
       qrCodeDialog: false,
-      saleId: ''
+      saleId: '',
+      orderId: '',
+      saleName: '',
+      orderStatus: '0'
     };
   },
   async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
@@ -200,6 +205,13 @@ export default {
     if (!this.$isServer) {
       this.QRCode = await import('qrcodejs2');
     }
+    const { query } = this.$route;
+    if (query.orderId && query.saleName) {
+      this.orderId = query.orderId;
+      this.saleName = decodeURIComponent(query.saleName);
+      const { data: { data } } = await getOrderInfo(this.orderId);
+      this.orderStatus = data.status;
+    }
   },
   computed: {
     needWords() {
@@ -218,6 +230,7 @@ export default {
   },
   methods: {
     openPayDialog(saleId) {
+      if (!this.QRCode) return false;
       const QRCode = this.QRCode.default;
       this.qrCodeDialog = true;
       this.saleId = saleId;
@@ -247,6 +260,7 @@ export default {
       const query = {
         userId: this.$store.state.user.userInfo._id,
         productId: this.$route.query.id,
+        orderId: this.orderId,
         content: this.userComment,
         rate: this.userRate,
       }

@@ -37,12 +37,14 @@ export function queryProduct(id) {
 export function comment({
   userId,
   productId,
+  orderId,
   rate,
   content,
 }) {
   return request.post('/comment/addComment', {
     userId,
     productId,
+    orderId,
     rate,
     content,
   });
@@ -58,4 +60,8 @@ export function placeOrder({
   userId,
 }) {
   return request.get(`/order/placeOrder?saleId=${saleId}&productId=${productId}&userId=${userId}`);
+}
+
+export function getOrderInfo(orderId) {
+  return request.get(`/order/getOrderInfo?orderId=${orderId}`);
 }

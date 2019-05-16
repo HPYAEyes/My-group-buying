@@ -11,6 +11,11 @@ const CommentSchema = new Schema({
     required: true,
     ref: 'Product'
   },
+  orderId: {
+    type: mongoose.ObjectId,
+    required: true,
+    ref: 'Order'
+  },
   rate: {
     type: Number,
     default: 0,
