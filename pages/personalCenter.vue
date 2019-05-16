@@ -22,7 +22,9 @@
           <el-collapse-item v-for="item in orderList" :key="item._id">
             <template slot="title">
               <div class="order-item">
-                <img class="order-img" :src="item.imgUrl[0]">
+                <nuxt-link :to="{ path: '/productDetail', query: { id: item.productId }}">
+                  <img class="order-img" :src="item.imgUrl[0]">
+                </nuxt-link>
                 <div class="order-info">
                   <p>{{ item.saleName }}</p>
                   <span>订单编号：{{ item._id }}</span>
@@ -33,7 +35,7 @@
                   <span v-if="item.status === '0'">已评价</span>
                   <span v-else-if="item.status === '1'">待使用</span>
                   <span v-else-if="item.status === '2'">待评价</span>
-                  <span v-else-if="item.status === '3'">已使用</span>
+                  <span v-else-if="item.status === '3'">已过期</span>
                 </div>
               </div>
             </template>
@@ -120,6 +122,11 @@ const { mapActions } = createNamespacedHelpers('user');
 
 export default {
   name: 'personalCenter',
+  fetch({ store, redirect }) {
+    if (store.state.user.userInfo.username === '') {
+      return redirect('/');
+    }
+  },
   data() {
     const validateNewPwd = (rule, value, callback) => {
       if (value === this.modifyPwdForm.oldPwd ) {

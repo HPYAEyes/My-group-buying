@@ -296,9 +296,6 @@ export default {
           register(query).then((res) => {
             this.$message.success(res.data.msg);
             this.registerDialog = false;
-            setTimeout(() => {
-              location.reload();
-            }, 2000);
           });
         } else {
           console.log('error submit!');
@@ -318,7 +315,7 @@ export default {
             this.loginDialog = false;
             setTimeout(() => {
               location.reload();
-            }, 2000);
+            }, 1200);
           });
         }
       });
@@ -331,7 +328,7 @@ export default {
         this.$message.success(res.data.msg);
         setTimeout(() => {
           location.reload();
-        }, 2000);
+        }, 1200);
       });
     }
   }

@@ -163,7 +163,7 @@ import {
   queryCommentList,
   placeOrder
 } from 'api/product';
-import QRCode from 'qrcodejs2';
+// import QRCode from 'qrcodejs2';
 
 export default {
   name: 'productDetail',
@@ -178,21 +178,27 @@ export default {
     };
   },
   async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
-    const { data: { data: productInfo } } = await queryProduct(route.query.id);
-    const { data: { data: { commentList, totalRecords: total } } } = await queryCommentList(route.query.id);
-    const firstList = store.state.product.hotProduct.firstTab.slice(0, 3);
-    const secondList = store.state.product.hotProduct.secondTab.slice(0, 3);
-    const thirdList = store.state.product.hotProduct.thirdTab.slice(0, 3);
-    const recommand = firstList.concat(secondList, thirdList);
-    return {
-      productInfo,
-      commentList,
-      commentPageInfo: {
-        pageNum: 1,
-        pageSize: 10,
-        total
-      },
-      recommand
+      const { data: { data: productInfo } } = await queryProduct(route.query.id);
+      const { data: { data: { commentList, totalRecords: total } } } = await queryCommentList(route.query.id);
+      const firstList = store.state.product.hotProduct.firstTab.slice(0, 3);
+      const secondList = store.state.product.hotProduct.secondTab.slice(0, 3);
+      const thirdList = store.state.product.hotProduct.thirdTab.slice(0, 3);
+      const recommand = firstList.concat(secondList, thirdList);
+      return {
+        productInfo,
+        commentList,
+        commentPageInfo: {
+          pageNum: 1,
+          pageSize: 10,
+          total
+        },
+        recommand,
+      }
+  },
+  async mounted() {
+    // 服务端没有document对象，需要在客户端环境加载
+    if (!this.$isServer) {
+      this.QRCode = await import('qrcodejs2');
     }
   },
   computed: {
@@ -204,7 +210,7 @@ export default {
     }
   },
   watch: {
-    $route(to, from) {
+    async $route(to, from) {
       if (to.query.id !== from.query.id) {
         location.reload()
       }
@@ -212,6 +218,7 @@ export default {
   },
   methods: {
     openPayDialog(saleId) {
+      const QRCode = this.QRCode.default;
       this.qrCodeDialog = true;
       this.saleId = saleId;
       this.$nextTick(() => {

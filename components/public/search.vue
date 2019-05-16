@@ -4,7 +4,7 @@
     <div class="search-main">
       <div class="search-form">
         <el-input class="search-input" prefix-icon="el-icon-search" placeholder="搜索商户名、地址等"></el-input>
-        <el-button class="search-btn" type="primary">搜索</el-button>
+        <el-button class="search-btn" type="primary" @click="$router.push({ path: '/productList' })">搜索</el-button>
       </div>
       <!-- <dl class="hot-search">
         <dt>大家都在搜：</dt>
