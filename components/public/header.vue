@@ -212,7 +212,16 @@ export default {
     } else {
       this.choosedCity = this.$store.state.geo.choosedCity;
     }
-    this.username = this.$store.state.user.userInfo.username ? this.$store.state.user.userInfo.username : '';
+    if (this.$store.state.user.userInfo.username) {
+      this.username = this.$store.state.user.userInfo.username;
+      this.$store.subscribe((mutation, state) => {
+        if (mutation.type = 'user/setUserInfo') {
+          this.username = state.user.userInfo.username;
+        }
+      });
+    } else {
+      this.username = ''
+    }
   },
   computed: {
     ...mapState({

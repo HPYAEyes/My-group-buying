@@ -3,7 +3,7 @@
     <div class="personal-header">
       <img class="user-avatar" :src="avatar" alt="用户头像">
       <div class="user-info">
-        <h1>{{ username }}</h1>
+        <h1>{{ $store.state.user.userInfo.username }}</h1>
         <p class="user-email">{{ email }}</p>
         <p class="user-createtime">于{{ $moment(createdAt).fromNow() }}加入了本网站</p>
       </div>
@@ -87,8 +87,17 @@
         </div>
         <div class="personal-info">
           <div class="info-label">昵称</div>
-          <p>{{ username }}</p>
-          <el-button class="modify-btn" round>修改</el-button>
+          <template v-if="!nameIsEdit">
+            <p>{{ $store.state.user.userInfo.username }}</p>
+            <el-button class="modify-btn" round @click="nameIsEdit = true">修改</el-button>
+          </template>
+          <template v-else>
+            <el-input class="modify-input" v-model="username"></el-input>
+            <div class="modify-div">
+              <el-button type="primary" round @click="updateUsername">确定</el-button>
+              <el-button round @click="cancelUpdateUsername">取消</el-button>
+            </div>
+          </template>
         </div>
         <div class="personal-info">
           <div class="info-label">邮箱</div>
@@ -166,6 +175,7 @@ export default {
       orderList: [],
       status: '',
       qrCodeDialog: false,
+      nameIsEdit: false,
       modifyPwdDialog: false,
       modifyPwdForm: {
         oldPwd: '',
@@ -228,6 +238,19 @@ export default {
     ...mapActions([
       'setUserInfo'
     ]),
+    updateUsername() {
+      const newUserInfo = { ...this.$store.state.user.userInfo, username: this.username };
+      this.setUserInfo(newUserInfo);
+      const { _id } = this.$store.state.user.userInfo;
+      updatePersonalInfo({ _id, username: this.username }).then((res) => {
+        this.nameIsEdit = false;
+        this.$message.success(res.data.msg);
+      });
+    },
+    cancelUpdateUsername() {
+      this.nameIsEdit = false;
+      this.username = this.$store.state.user.userInfo.username;
+    },
     refundConfirm(orderId) {
       this.$confirm('您确定要退款吗？', '确认退款', {
         confirmButtonText: '确定',
@@ -236,6 +259,9 @@ export default {
       }).then(() => {
         refund(orderId).then((res) => {
           this.$message.success(res.data.msg);
+          setTimeout(() => {
+            location.reload();
+          }, 1500);
         });
       }).catch(() => {
         this.$message({
@@ -492,6 +518,17 @@ export default {
       }
 
       .modify-btn {
+        margin-left: auto;
+        margin-right: 30px;
+      }
+
+      .modify-input {
+        margin-left: 30px;
+        width: 300px;
+      }
+
+      .modify-div {
+        display: flex;
         margin-left: auto;
         margin-right: 30px;
       }

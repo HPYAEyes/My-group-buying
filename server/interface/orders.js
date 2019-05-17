@@ -86,7 +86,7 @@ router.get('/getOrderList', async (ctx) => {
   if (status) {
     params.status = status;
   }
-  const orderList = await Order.find(params);
+  const orderList = await Order.find(params).sort({createdAt: 'desc'}).exec();
   if (orderList) {
     ctx.body = {
       code: 'SUC',

@@ -39,6 +39,9 @@
                 <span>{{ item.name }}</span>
                 <i class="iconfont tg-tuan main-color"></i>
               </div>
+              <div style="margin-left:6px;font-size: 12px;color:#999;">
+                有效期至{{ item.expires }}
+              </div>
               <div class="price">
                 <span style="color:#f90">￥<span style="font-size:28px">{{ item.offPrice }}</span></span>
                 <span style="margin-left:16px;color:#999;font-size:12px;">门店价{{ item.salePrice }}</span>

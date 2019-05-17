@@ -190,15 +190,27 @@ router.get('/signout', async (ctx, next) => {
 // 获取用户信息
 router.get('/getUser', async (ctx) => {
   if (ctx.isAuthenticated()) {
-    const { username, email, _id, avatar, createdAt } = ctx.session.passport.user;
-    ctx.body = {
-      code: 'SUC',
-      username,
-      email,
-      _id,
-      avatar,
-      createdAt
-    };
+    const { email, _id, createdAt } = ctx.session.passport.user;
+    const userInfo = await User.findOne({ _id });
+    if (userInfo) {
+      ctx.body = {
+        code: 'SUC',
+        email,
+        _id,
+        createdAt,
+        avatar: userInfo.avatar,
+        username: userInfo.username
+      };
+    } else {
+      ctx.body = {
+        code: 'SUC',
+        username: '',
+        email: '',
+        _id: '',
+        avatar: '',
+        createdAt: ''
+      };
+    }
   } else {
     ctx.body = {
       code: 'SUC',
