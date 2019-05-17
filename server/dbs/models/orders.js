@@ -47,7 +47,7 @@ const OrderSchema = new Schema({
     type: String,
     required: true
   },
-  status: { // 0为已评价，1为待使用，2为待评价，3为已过期, 4为已退单
+  status: { // 0为已评价，1为待使用，2为待评价，3为已过期, 4为已退款
     type: String,
     required: true
   }

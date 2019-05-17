@@ -13,7 +13,7 @@
       <li @click="status = '1'"><i class="iconfont tg-daishiyong">待使用</i></li>
       <li @click="status = '2'"><i class="iconfont tg-daipingjia">待评价</i></li>
       <li @click="status = '3'"><i class="iconfont tg-yiguoqi">已过期</i></li>
-      <li @click="status = '3'"><i class="iconfont tg-yiguoqi">已退单</i></li>
+      <li @click="status = '4'"><i class="iconfont tg-tuikuan">已退款</i></li>
       <li @click="status = '-1'"><i class="iconfont tg-gerenxinxi">个人信息设置</i></li>
     </ul>
     <div class="personal-container">
@@ -37,9 +37,11 @@
                   <span v-else-if="item.status === '1'">待使用</span>
                   <span v-else-if="item.status === '2'">待评价</span>
                   <span v-else-if="item.status === '3'">已过期</span>
+                  <span v-else-if="item.status === '4'">已退款</span>
                 </div>
                 <div class="order-operate">
-                  <el-button v-if="item.status === '1'" size="mini" round @click="openUseDialog(item._id)">去使用</el-button>
+                  <el-button v-if="item.status === '1'" type="primary" size="mini" round @click="openUseDialog(item._id)">去使用</el-button>
+                  <el-button v-if="item.status === '1'" size="mini" round style="margin-left:20px;" @click="refundConfirm(item._id)">退款</el-button>
                   <el-button v-if="item.status === '2'" size="mini" round @click="gotoComment(item)">去评价</el-button>
                 </div>
               </div>
@@ -57,6 +59,7 @@
           title="使用团购优惠券"
           :visible.sync="qrCodeDialog"
           center
+          @close="clearTimer"
           width="306px">
           <div ref="userCode"></div>
           <div style="margin-top: 20px;display:flex;justify-content: space-between;">
@@ -129,8 +132,10 @@
 import {
   getUserOrderList,
   updatePersonalInfo,
-  updateUserPwd
+  updateUserPwd,
+  refund
 } from 'api/personal';
+import { getOrderInfo } from 'api/product';
 import { createNamespacedHelpers  } from 'vuex';
 
 const { mapActions } = createNamespacedHelpers('user');
@@ -179,7 +184,8 @@ export default {
           { required: true, message: '请重复输入密码', trigger: 'blur' },
           { required: true, trigger: 'blur', validator: validateRepeatPwd }
         ],
-      }
+      },
+      timer: '',
     };
   },
   asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
@@ -206,6 +212,7 @@ export default {
         '1': '待使用',
         '2': '待评价',
         '3': '已过期',
+        '4': '已退款',
         '-1': '个人信息设置'
       };
       return titleObj[this.status];
@@ -221,6 +228,22 @@ export default {
     ...mapActions([
       'setUserInfo'
     ]),
+    refundConfirm(orderId) {
+      this.$confirm('您确定要退款吗？', '确认退款', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        refund(orderId).then((res) => {
+          this.$message.success(res.data.msg);
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消退款'
+        });
+      })
+    },
     gotoComment({ _id, productId, saleName}) {
       this.$router.push({ path: '/productDetail', query: {
         id: productId,
@@ -235,7 +258,24 @@ export default {
       this.$nextTick(() => {
         this.$refs.userCode.innerHTML = '';
         new QRCode(this.$refs.userCode, `http://mygroupbuy.natapp1.cc/order/orderUse?orderId=${orderId}`);  
+        this.checkPay(orderId);
       });
+    },
+    clearTimer() {
+      clearInterval(this.timer);
+    },
+    checkPay(orderId) {
+      this.timer = setInterval(() => {
+        getOrderInfo(orderId).then((res) => {
+          if (res.data.data.status === '2') {
+            this.$message.success('使用成功');
+            setTimeout(() => {
+              location.reload();
+            }, 1500);
+            this.clearTimer();
+          }
+        });
+      }, 2500);
     },
     modifyPwd(formName) {
       this.$refs[formName].validate((valid) => {
@@ -385,13 +425,19 @@ export default {
 
     .tg-yiguoqi {
       &:before {
-        color: #f56c6c;
+        color: #f5222d;
       }
     }
 
     .tg-gerenxinxi {
       &:before {
         color: #67c23a;        
+      }
+    }
+
+    .tg-tuikuan {
+      &:before {
+        color: #fa541c;
       }
     }
   }
@@ -506,9 +552,13 @@ export default {
     }
 
     .order-price,
-    .order-status,
-    .order-operate{
-      flex-basis: 120px;
+    .order-status {
+      flex-basis: 160px;
+    }
+
+    .order-operate {
+      display: flex;
+      flex-basis: 200px;
     }
   }
 }

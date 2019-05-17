@@ -4,7 +4,7 @@ export function getUserOrderList({
   userId,
   status
 }) {
-  const statusArr = ['0', '1', '2', '3'];
+  const statusArr = ['0', '1', '2', '3', '4'];
   let params = '';
   if (statusArr[status] !== undefined) {
     params = `&status=${status}`
@@ -34,4 +34,8 @@ export function updateUserPwd({
     oldPwd,
     newPwd
   });
+}
+
+export function refund(orderId) {
+  return request.post('/order/refund', { orderId });
 }

@@ -126,4 +126,46 @@ router.get('/getOrderInfo', async (ctx) => {
   }
 });
 
+// 退款
+router.post('/refund', async (ctx) => {
+  const { orderId } = ctx.request.body;
+  if (!orderId) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const order = await Order.updateOne({ _id: orderId }, { status: '4' });
+  if (order.n) {
+    ctx.body = {
+      code: 'SUC',
+      msg: '退款成功'
+    };
+  } else {
+    ctx.body = {
+      code: 'DERR',
+      msg: '退款失败'
+    }
+  }
+});
+
+// 检查是否扫码支付了
+router.get('/checkPay', async (ctx) => {
+  const { saleId, productId, userId } = ctx.query;
+  if (!saleId || !productId || !userId) {
+    ctx.body = {
+      code: 'CERR',
+      msg: '参数有误'
+    };
+    return false;
+  }
+  const count = await Order.countDocuments({ saleId, productId, userId });
+  ctx.body = {
+    code: 'SUC',
+    msg: 'checked',
+    data: count
+  };
+});
+
 export default router;

@@ -15,7 +15,8 @@ export function queryProductList({
   sort,
   adcode,
   type,
-  street
+  street,
+  keyword
 }) {
   let query = `pageSize=${pageSize}&pageNum=${pageNum}&cityCode=${cityCode}&sort=${sort}`;
   if (adcode) {
@@ -26,6 +27,9 @@ export function queryProductList({
   }
   if(street) {
     query += `&street=${street}`;
+  }
+  if (keyword) {
+    query += `&keyword=${keyword}`
   }
   return request.get(`/product/getProductList?${query}`);
 }
@@ -60,6 +64,14 @@ export function placeOrder({
   userId,
 }) {
   return request.get(`/order/placeOrder?saleId=${saleId}&productId=${productId}&userId=${userId}`);
+}
+
+export function checkPay({
+  saleId,
+  productId,
+  userId,
+}) {
+  return request.get(`/order/checkPay?saleId=${saleId}&productId=${productId}&userId=${userId}`);
 }
 
 export function getOrderInfo(orderId) {

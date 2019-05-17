@@ -198,6 +198,13 @@ export default {
     // this.filterPlace.choosedPlace = this.$route.query.adcode;
     this.getProductList();
   },
+  watch: {
+    $route(to, from) {
+      if (to.query.keyword !== from.query.keyword) {
+        this.getProductList();
+      }
+    }
+  },
   methods: {
     /**
      * @description 获取团购信息列表
@@ -211,6 +218,7 @@ export default {
         pageNum: this.pageInfo.pageNum,
         pageSize: this.pageInfo.pageSize,
         cityCode: this.$store.state.geo.choosedCity.adcode,
+        keyword: this.$route.query.keyword || '',
         adcode,
         sort,
         type,

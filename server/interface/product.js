@@ -227,7 +227,7 @@ router.post('/setHot', async (ctx) => {
 
 // 获取团购信息列表
 router.get('/getProductList', async (ctx) => {
-  const { pageSize, pageNum, cityCode, adcode, type, street, sort } = ctx.query;
+  const { pageSize, pageNum, cityCode, adcode, type, street, sort, keyword = '' } = ctx.query;
   if (!pageSize || !pageNum || !cityCode || !sort) {
     ctx.body = {
       code: 'CERR',
@@ -235,24 +235,29 @@ router.get('/getProductList', async (ctx) => {
     };
     return false;
   }
+  const params = { cityCode };
   const filterBy = {
     '人气最高': { averRate: 'desc'},
     '评价最多': { commentCount: 'desc'},
     '价格降序': { price: 'desc'},
     '价格升序': { price: 'asc'},
-  }
-  const params = { cityCode };
+  };
   if (adcode) {
     params.adcode = adcode;
   }
   if (street) {
-    params.place = street;
+    params.street = street;
   }
   if (type) {
     params.type = type;
   }
-  const productList = await Product.find(params).skip((pageNum - 1) * pageSize).limit(Number(pageSize)).sort(filterBy[sort]).exec();
-  const totalRecords = await Product.countDocuments(params);
+  const productList = await Product.find(params)
+    .or([{ name: { $regex: keyword }}, { address: { $regex: keyword }}])
+    .skip((pageNum - 1) * pageSize)
+    .limit(Number(pageSize))
+    .sort(filterBy[sort])
+    .exec();
+  const totalRecords = await Product.countDocuments(params).or([{ name: { $regex: keyword }}, { address: { $regex: keyword }}]).exec();
   if (productList && totalRecords !== undefined) {
     ctx.body = {
       code: 'SUC',

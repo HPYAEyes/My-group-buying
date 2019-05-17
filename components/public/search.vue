@@ -3,23 +3,25 @@
     <img class="index-logo" src="../../assets/img/groupbuy.png" >
     <div class="search-main">
       <div class="search-form">
-        <el-input class="search-input" prefix-icon="el-icon-search" placeholder="搜索商户名、地址等"></el-input>
-        <el-button class="search-btn" type="primary" @click="$router.push({ path: '/productList' })">搜索</el-button>
+        <el-input class="search-input" prefix-icon="el-icon-search" placeholder="搜索商户名、地址等" v-model="keyword"></el-input>
+        <el-button class="search-btn" type="primary" @click="searchProduct">搜索</el-button>
       </div>
-      <!-- <dl class="hot-search">
-        <dt>大家都在搜：</dt>
-        <dd>嘉里中心</dd>
-        <dd>万象城</dd>
-        <dd>外婆家</dd>
-        <dd>一点点</dd>
-        <dd>星巴克</dd>
-      </dl> -->
     </div>
   </div>
 </template>
 <script>
 export default {
-  
+  name: 'search',
+  data() {
+    return {
+      keyword: ''
+    };
+  },
+  methods: {
+    searchProduct() {
+      this.$router.push({ path: '/productList', query: { ...this.$route.query, keyword: this.keyword }});
+    }
+  }
 }
 </script>
 <style lang="scss">

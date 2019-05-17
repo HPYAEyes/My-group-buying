@@ -148,7 +148,8 @@
       title="扫码支付"
       :visible.sync="qrCodeDialog"
       center
-      width="306px">
+      width="306px"
+      @close="clearTimer">
       <div ref="qrcode"></div>
       <div style="margin-top: 20px;display:flex;justify-content: space-between;">
         <el-button @click="qrCodeDialog = false">取消</el-button>
@@ -163,6 +164,7 @@ import {
   comment,
   queryCommentList,
   placeOrder,
+  checkPay,
   getOrderInfo
 } from 'api/product';
 // import QRCode from 'qrcodejs2';
@@ -179,7 +181,9 @@ export default {
       saleId: '',
       orderId: '',
       saleName: '',
-      orderStatus: '0'
+      orderStatus: '0',
+      timer: '',
+      payCount: 0
     };
   },
   async asyncData({isDev, route, store, env, params, query, req, res, redirect, error}) {
@@ -222,7 +226,7 @@ export default {
     }
   },
   watch: {
-    async $route(to, from) {
+    $route(to, from) {
       if (to.query.id !== from.query.id) {
         location.reload()
       }
@@ -237,7 +241,27 @@ export default {
       this.$nextTick(() => {
         this.$refs.qrcode.innerHTML = '';
         new QRCode(this.$refs.qrcode, `http://mygroupbuy.natapp1.cc/order/placeOrder?saleId=${saleId}&productId=${this.$route.query.id}&userId=${this.$store.state.user.userInfo._id}`);  
+        this.checkPayCount({ saleId, productId: this.$route.query.id, userId: this.$store.state.user.userInfo._id });
       });
+    },
+    clearTimer() {
+      clearInterval(this.timer);
+    },
+    checkPayCount({ saleId, productId, userId }) {
+      checkPay({ saleId, productId, userId }).then((res) => {
+        this.payCount = res.data.data;
+      });
+      this.timer = setInterval(() => {
+        checkPay({ saleId, productId, userId }).then((res) => {
+          if (res.data.data !== this.payCount) {
+            this.$message.success('支付成功！');
+            setTimeout(() => {
+              this.$router.push({ path: '/personalCenter' });
+            }, 1500);
+            this.clearTimer();
+          }
+        });
+      }, 2500);
     },
     buyProduct() {
       placeOrder({
