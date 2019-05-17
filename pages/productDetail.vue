@@ -237,6 +237,10 @@ export default {
   },
   methods: {
     openPayDialog(saleId) {
+      if (this.$store.state.user.userInfo._id === '') {
+        this.$message.warning('请先登录再进行此操作！');
+        return false;
+      }
       if (!this.QRCode) return false;
       const QRCode = this.QRCode.default;
       this.qrCodeDialog = true;
